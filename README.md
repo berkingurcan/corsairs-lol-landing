@@ -27,6 +27,12 @@ Framework preset **Next.js** — auto-detected. Then add `corsairs.lol` under
 **Project → Settings → Domains**. `vercel.json` carries the cache and security
 headers; routing is the framework's.
 
+**There is nothing to configure.** This project reads no environment variable —
+no `process.env`, no `.env` file, no API key, no analytics id, no build secret.
+Every number and every URL is a literal in [`lib/site.ts`](lib/site.ts), and
+`output: "export"` means there is no server at request time to hold a secret
+anyway. Import the repo and deploy; the only manual step is the domain.
+
 ## Before you touch a number
 
 **Everything on this page traces to the app and the settlement server.** The
@@ -51,7 +57,7 @@ this page advertises a payout the chain does not make.
 | Treasury gets | **0.10p**, i.e. **8.3% of the sale** |
 | First capture | no previous owner, so the **whole** opening price goes to the treasury |
 | Bid ceiling | **100×** the floor (`MAX_BID_MULTIPLE`) — a fat-finger guard, enforced in SQL |
-| Banner limits | title **22**, tagline **120**, link **150** |
+| Banner limits | title **22**, tagline **120**, link **150** — enforced by the app, deliberately *not* printed on the page |
 
 > The split was **70/30** in an earlier revision and is **50/50** now. Migration
 > `0005` spells out the change and its consequence: protocol revenue per flip
@@ -66,7 +72,13 @@ this page advertises a payout the chain does not make.
 - **No push notifications exist.** There is no `notificationService`. A
   displaced captain sees it in Profile next time they open the app. Never imply
   something reaches their phone.
-- **Android and Seeker only.** Mobile Wallet Adapter does not exist on iOS.
+- **Android and Seeker only.** Mobile Wallet Adapter has no iOS implementation.
+  That is the reason; the page states the consequence — "There is no iOS
+  build" — without the acronym.
+- **Nothing links to a download.** There is no dApp Store listing URL and no
+  public repo, so every call to action on the site points at
+  [`site.x`](lib/site.ts), the one destination that exists. Do not reintroduce a
+  store or GitHub link until there is a real one to reintroduce.
 - **No token, points, airdrop or snapshot** — and no usage number nobody has
   measured. There is no claimed-country counter here for that reason.
 - **The banner card on `/` is labelled as an example.** The repo's
@@ -74,12 +86,6 @@ this page advertises a payout the chain does not make.
   real app screenshot to use.
 - The board opens honestly — `0007_mainnet_board_reset.sql` wipes the seeded
   scenery, leaving 194 unclaimed and Turkey held by the treasury.
-
-## The one thing left to fill in
-
-`site.store` in [`lib/site.ts`](lib/site.ts) points at the dApp Store's front
-door, because this repo has no record of the listing's address. Paste the real
-listing URL there and every store button on the site follows.
 
 ## Regenerating from the app repo
 

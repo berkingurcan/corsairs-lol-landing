@@ -389,7 +389,13 @@ h3 {
 }
 /* The accent is reserved for prices, so it has to out-rank the cell colour. */
 .specs dd.price { color: var(--accent); }
-.note { margin: 20px 0 0; font-family: var(--mono); font-size: 0.74rem; color: var(--fg-3); }
+
+/* What the banner is FOR — same hairline language as the specs above it, but
+   stacked, because these are sentences rather than values. */
+.uses { margin: 34px 0 0; padding: 0; list-style: none; }
+.uses li { padding: 18px 0; border-top: 1px solid var(--line-soft); }
+.uses li:last-child { border-bottom: 1px solid var(--line-soft); }
+.uses p { margin: 7px 0 0; font-size: 0.92rem; line-height: 1.6; max-width: 44ch; }
 
 .banner-card {
   margin: 0;

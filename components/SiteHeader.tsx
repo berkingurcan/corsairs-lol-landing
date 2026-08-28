@@ -29,8 +29,8 @@ export function SiteHeader() {
 
         <div className="nav-end">
           <ThemeToggle />
-          <a className="btn btn-ghost nav-cta" href={site.store} rel="noopener">
-            Get the app
+          <a className="btn btn-ghost nav-cta" href={site.x} rel="noopener">
+            Follow on X
           </a>
         </div>
       </div>

@@ -80,12 +80,12 @@ export default async function TerritoryPage({ params }: Props) {
             </p>
 
             <div className="cta">
-              <a className="btn btn-solid" href={site.store} rel="noopener">
-                Open it in the app
-              </a>
-              <Link className="btn btn-ghost" href="/">
+              <Link className="btn btn-solid" href="/#how">
                 How the game works
               </Link>
+              <a className="btn btn-ghost" href={site.x} rel="noopener">
+                Follow {site.xHandle}
+              </a>
             </div>
 
             <dl className="specs territory-facts">

@@ -11,13 +11,18 @@ export function SiteFooter() {
           <Mark className="mark" />
           <span>corsairs.lol</span>
         </Link>
-        <nav className="foot-links" aria-label="Elsewhere">
-          <a href={site.x} rel="me noopener">X</a>
-          <a href={site.github} rel="noopener">GitHub</a>
-          <a href={site.store} rel="noopener">dApp Store</a>
+        <nav className="foot-links" aria-label="Footer">
+          <Link href="/#how">How it works</Link>
+          <Link href="/#economics">Economics</Link>
+          <a href={site.x} rel="me noopener">
+            X
+          </a>
         </nav>
         <p className="foot-note">
-          Built for Solana Seeker. Android only — Mobile Wallet Adapter does not exist on iOS.
+          {/* Static export, so this is the build year — which is the year the
+              copy was last true anyway. */}
+          © {new Date().getFullYear()} corsairs.lol · A mobile game for Solana Seeker
+          and Android. Every price on the board is real SOL on mainnet.
         </p>
       </div>
     </footer>

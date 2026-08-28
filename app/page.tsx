@@ -3,7 +3,6 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { fmt, game, priceLadder, site } from "@/lib/site";
 
 const ladder = priceLadder(3);
-const bannerChars = game.limits.title + game.limits.tagline + game.limits.link;
 
 export default function Home() {
   return (
@@ -17,28 +16,29 @@ export default function Home() {
           <div className="hero-veil" aria-hidden="true" />
 
           <div className="shell hero-in">
-            <p className="kicker">Live on Solana · Seeker and Android</p>
+            <p className="kicker">Live on Solana mainnet · Seeker and Android</p>
             <h1>
-              Raise your
+              Every country
               <br />
-              banner.
+              has a price.
             </h1>
             <p className="lede">
-              Capture one of {game.countries} countries, fly your banner on it, and hold
-              it until another captain pays more.
+              {game.countries} countries on one map. Claim one for{" "}
+              <b className="price">{game.basePrice}&nbsp;SOL</b>, fly your banner over
+              it, and get paid the moment another captain takes it.
             </p>
             <div className="cta">
-              <a className="btn btn-solid" href={site.store} rel="noopener">
-                Get it on the dApp Store
+              <a className="btn btn-solid" href={site.x} rel="noopener">
+                Follow {site.xHandle}
               </a>
-              <a className="btn btn-ghost" href={site.x} rel="noopener">
-                Follow the map
+              <a className="btn btn-ghost" href="#how">
+                How it works
               </a>
             </div>
             <p className="fineprint">
               <span className="dot" aria-hidden="true" />
-              Every price on the board is real money. No token, no points, nothing to
-              farm.
+              Real SOL, on mainnet. No token, no points, no airdrop — the only thing to
+              buy is a country.
             </p>
           </div>
 
@@ -71,25 +71,26 @@ export default function Home() {
                 <span className="step-n">01</span>
                 <h3>Capture</h3>
                 <p>
-                  An unclaimed country opens at <b className="price">{game.basePrice}&nbsp;SOL</b>.
-                  Two taps, signed in your wallet.
+                  An unclaimed country opens at{" "}
+                  <b className="price">{game.basePrice}&nbsp;SOL</b>. Two taps and one
+                  signature in your wallet, and it is yours.
                 </p>
               </li>
               <li>
                 <span className="step-n">02</span>
                 <h3>Raise your banner</h3>
                 <p>
-                  A title, a tagline, a link and a colour — written on chain in a
-                  separate transaction that moves no money.
+                  A name, a line, a link and a colour — written on chain in a second
+                  transaction that moves no money. Rewrite it as often as you like.
                 </p>
               </li>
               <li>
                 <span className="step-n">03</span>
                 <h3>Get taken, get paid</h3>
                 <p>
-                  Anyone can take the country for at least <b>+20%</b> of what you paid.
-                  That same transaction returns your principal plus half the increase.
-                  There is nothing to claim.
+                  Anyone can take your country for at least <b>+20%</b> of what you paid.
+                  That same transaction sends your principal plus half the increase
+                  straight to your wallet. Nothing to claim, nothing to unlock.
                 </p>
               </li>
             </ol>
@@ -102,36 +103,36 @@ export default function Home() {
             <div>
               <header className="sec-head">
                 <p className="kicker">02 — The banner</p>
-                <h2>A country is a slot. The banner is what you put in it.</h2>
+                <h2>A country is a slot. Your banner is what fills it.</h2>
                 <p className="section-lede">
-                  Not a bag and not a badge: {bannerChars} characters and a colour,
-                  standing on a world map until somebody pays more than you did.
+                  Not a bag and not a badge. A name, a line and a link, standing on a
+                  world map until somebody pays more than you did.
                 </p>
               </header>
 
-              <dl className="specs">
-                <div>
-                  <dt>Title</dt>
-                  <dd>{game.limits.title} characters</dd>
-                </div>
-                <div>
-                  <dt>Tagline</dt>
-                  <dd>{game.limits.tagline} characters</dd>
-                </div>
-                <div>
-                  <dt>Link</dt>
-                  <dd>{game.limits.link} characters</dd>
-                </div>
-                <div>
-                  <dt>Colour</dt>
-                  <dd>Ten presets</dd>
-                </div>
-              </dl>
-
-              <p className="note">
-                Buy in two taps. Write the banner afterwards, and rewrite it whenever
-                you like.
-              </p>
+              <ul className="uses">
+                <li>
+                  <h3>Your flag on the board</h3>
+                  <p>
+                    Every captain who opens the map sees who holds the country and what
+                    they had to say about it.
+                  </p>
+                </li>
+                <li>
+                  <h3>A page to point at</h3>
+                  <p>
+                    Every country has its own page on this site, so a share out of the
+                    app lands somewhere real instead of on a dead link.
+                  </p>
+                </li>
+                <li>
+                  <h3>Yours until it is not</h3>
+                  <p>
+                    The banner stands for as long as you hold the country, and changing
+                    it costs a signature and network fees. Nothing else.
+                  </p>
+                </li>
+              </ul>
             </div>
 
             <figure className="banner-card">
@@ -146,12 +147,12 @@ export default function Home() {
                 <span className="bc-tag">Held</span>
               </div>
               <div className="bc-body">
-                <p className="bc-title">Ye Olde Sardine Co.</p>
+                <p className="bc-title">Lisbon Outpost</p>
                 <p className="bc-tagline">
-                  Salt, tin, and a very small navy. Come take it if you think you can
-                  hold it.
+                  Coffee, code and a very small navy. Take it if you think you can hold
+                  it.
                 </p>
-                <p className="bc-link">sardines.example</p>
+                <p className="bc-link">lisbon.example</p>
               </div>
               <div className="bc-foot">
                 <div>
@@ -173,7 +174,7 @@ export default function Home() {
           <div className="shell">
             <header className="sec-head">
               <p className="kicker">03 — Economics</p>
-              <h2>What a takeover moves.</h2>
+              <h2>Where the money goes.</h2>
               <p className="section-lede">
                 A takeover costs at least <b>+20%</b> of the last price, and the increase
                 splits <b>in half</b> — half to the captain who just lost the country,
@@ -241,11 +242,11 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Plainly ────────────────────────────────────────────── */}
+        {/* ── Straight answers ───────────────────────────────────── */}
         <section id="plainly" className="band">
           <div className="shell">
             <header className="sec-head">
-              <p className="kicker">04 — Plainly</p>
+              <p className="kicker">04 — Straight answers</p>
               <h2>What this is, and what it is not.</h2>
             </header>
 
@@ -262,20 +263,23 @@ export default function Home() {
                 <h3>Ownership is a database row.</h3>
                 <p>
                   The chain is the payment rail and the banner ledger. There is no custom
-                  on-chain program, so there is nothing to audit and we do not call it
-                  trustless.
+                  on-chain program, so there is nothing to audit — and we are not going to
+                  call this trustless.
                 </p>
               </li>
               <li>
                 <h3>There is no token.</h3>
                 <p>
-                  No points, no seasons, no airdrop. The game is played in SOL, and the
-                  only thing to buy is a country.
+                  No points, no season, no airdrop, no snapshot. The game is played in
+                  SOL, and the only thing to buy is a country.
                 </p>
               </li>
               <li>
-                <h3>Android and Seeker only.</h3>
-                <p>Mobile Wallet Adapter does not exist on iOS.</p>
+                <h3>Android and Seeker.</h3>
+                <p>
+                  The game signs with the Solana wallet on your phone, which means Android
+                  and Seeker today. There is no iOS build.
+                </p>
               </li>
             </ul>
           </div>
@@ -287,14 +291,14 @@ export default function Home() {
             <h2>
               One map. {game.countries} countries.
               <br />
-              Every one can change hands.
+              Every one of them for sale.
             </h2>
             <div className="cta">
-              <a className="btn btn-solid" href={site.store} rel="noopener">
-                Get it on the dApp Store
+              <a className="btn btn-solid" href={site.x} rel="noopener">
+                Follow {site.xHandle}
               </a>
-              <a className="btn btn-ghost" href={site.x} rel="noopener">
-                Follow the map
+              <a className="btn btn-ghost" href="#economics">
+                Read the economics
               </a>
             </div>
           </div>

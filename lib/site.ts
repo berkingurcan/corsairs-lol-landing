@@ -15,22 +15,17 @@
 export const site = {
   name: "corsairs.lol",
   url: "https://corsairs.lol",
-  title: "corsairs.lol — Raise your banner.",
+  title: "corsairs.lol — Every country has a price.",
   description:
-    "A live territory game for Solana Seeker. Capture one of 195 countries, raise your banner on the map, and challenge the next captain. No token.",
-  x: "https://x.com/corsairslol",
-  xHandle: "@corsairslol",
-  github: "https://github.com/berkingurcan/crypto-corsairs",
+    "A live territory game on Solana. Claim one of 195 countries for 0.05 SOL, fly your banner over it, and get paid when the next captain takes it. No token.",
 
   /**
-   * PASTE THE LISTING URL HERE.
-   *
-   * The app is published, but this repo has no record of the listing's
-   * address, so this points at the store's front door rather than at a
-   * guessed deep link that would 404. Replace it with the real one and every
-   * store button on the site follows.
+   * The only outbound link on the site. There is no store listing URL and no
+   * public repo to point at, so nothing here promises a download that does not
+   * exist yet — every call to action sends people here instead.
    */
-  store: "https://store.solanamobile.com",
+  x: "https://x.com/corsairslol",
+  xHandle: "@corsairslol",
 
   /** Deep link the app registers. `share.ts` sends people to /t/<ISO2>. */
   appScheme: "corsairslol",
@@ -58,7 +53,11 @@ export const game = {
   /** QUICK_RAISE_BPS — presets offered next to the bid field. */
   quickRaises: [0.1, 0.25, 0.5],
 
-  /** LIMITS — enforced on input and again before signing. */
+  /**
+   * LIMITS — enforced on input and again before signing. Kept as a mirror of
+   * the app config; the page no longer prints them, because a character count
+   * is not a reason to play.
+   */
   limits: { title: 22, tagline: 120, link: 150 },
 
   countries: 195,
