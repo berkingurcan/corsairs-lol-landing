@@ -1,93 +1,138 @@
 # corsairs.lol — landing page
 
-A static, zero-dependency landing page for **corsairs.lol**, the live territory
-game for Solana Seeker. One HTML file, one stylesheet, four assets. No build
-step, no framework, nothing to keep up to date.
+Next.js (App Router) static site for **corsairs.lol**, the live territory game
+for Solana Seeker. Every route is prerendered — there is no data source at
+request time — so the whole thing deploys as static files.
 
-## Run it locally
+| Route | What it is |
+| :--- | :--- |
+| `/` | The landing page. |
+| `/t/<ISO2>` | 195 country pages. The app deep-links shares here (`src/utils/share.ts`), so all 195 have to resolve. |
+| `/sitemap.xml`, `/robots.txt` | Generated from the country list. |
 
 ```bash
-python3 -m http.server 8899
-# → http://127.0.0.1:8899
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # 200 static pages into out/
 ```
 
 ## Deploy to Vercel
-
-There is no build. Vercel serves the directory as-is.
 
 ```bash
 npx vercel            # preview
 npx vercel --prod     # production
 ```
 
-Framework preset: **Other**. Build command: none. Output directory: `.`
+Framework preset **Next.js** — auto-detected. Then add `corsairs.lol` under
+**Project → Settings → Domains**. `vercel.json` carries the cache and security
+headers; routing is the framework's.
 
-Then add `corsairs.lol` (and `www.corsairs.lol` redirecting to the apex) under
-**Project → Settings → Domains**. `vercel.json` handles clean URLs, immutable
-caching on `/assets/*`, and the usual security headers.
+## Before you touch a number
 
-## Files
+**Everything on this page traces to the app and the settlement server.** The
+authoritative copies, in the order that wins when they disagree:
 
-| Path | What it is |
+1. `server/supabase/migrations/*.sql` — this is what builds the transaction
+2. `server/supabase/functions/_shared/config.ts`
+3. `src/constants/gameConfig.ts` — the app's display copy
+
+The mirrors live in one file here, [`lib/site.ts`](lib/site.ts), and the payout
+table is computed from them rather than typed out. If they drift from the SQL,
+this page advertises a payout the chain does not make.
+
+### The economics, as of the app's `master`
+
+| | |
 | :--- | :--- |
-| `index.html` | The whole page. |
-| `styles.css` | The whole design. Palette and type tokens live at the top. |
-| `assets/world.svg` | Equirectangular world map, 167 country paths, generated from `src/data/worldMapGeometry.ts` in the app repo (Natural Earth 1:110m, public domain). Pure geography — it carries **no** ownership state. |
-| `assets/og.png` | 1200×630 social card, composed from the brand cover in `design/out/`. |
-| `assets/favicon.svg`, `assets/icon-512.png`, `assets/mark.svg` | The swallowtail-flag mark. |
+| Opening price | **0.05 SOL** (`BASE_TERRITORY_PRICE.SOL`) |
+| Price step | **1.20×** the last price (`PRICE_MULTIPLIER_BPS: 12000`) — a **floor**, not a fixed price |
+| Split of the increase | **50 / 50** — `PREVIOUS_OWNER_PROFIT_SHARE_BPS: 5000`, authority `split_payout()` in `0005_treasury_share.sql` |
+| Displaced captain gets | principal + half the increase = **1.10p**, i.e. **+10%** over what they paid |
+| Treasury gets | **0.10p**, i.e. **8.3% of the sale** |
+| First capture | no previous owner, so the **whole** opening price goes to the treasury |
+| Bid ceiling | **100×** the floor (`MAX_BID_MULTIPLE`) — a fat-finger guard, enforced in SQL |
+| Banner limits | title **22**, tagline **120**, link **150** |
 
-## Where the design comes from
+> The split was **70/30** in an earlier revision and is **50/50** now. Migration
+> `0005` spells out the change and its consequence: protocol revenue per flip
+> roughly doubles, and the flipper's return falls from +14% to +10%. Any copy
+> quoting 70/30, 0.057, 0.0684 or "+14%" is from before that migration.
 
-Nothing here was invented. It follows `design/BRAND.md` in the app repo:
+### Constraints the copy obeys
 
-- **Ground** `#04090F` · surface `#0D1E2B` · shoal `#1D3F47`
-- **Accent** `#F0894E` — the price, and only the price. One saturated element
-  per composition.
-- Rim `#6FD3E8` for links and focus. Text `#EBE6DC` / `#B9C4CC` / `#7D8D99`.
-- Display **Fraunces**, data **IBM Plex Mono**, body **IBM Plex Sans**.
+- **Never** *trustless*, *fully on-chain*, *decentralised*, *audited* or
+  *non-custodial*. Ownership is a row in Postgres; the chain is the payment rail
+  and the banner ledger. The page says so out loud, on purpose.
+- **No push notifications exist.** There is no `notificationService`. A
+  displaced captain sees it in Profile next time they open the app. Never imply
+  something reaches their phone.
+- **Android and Seeker only.** Mobile Wallet Adapter does not exist on iOS.
+- **No token, points, airdrop or snapshot** — and no usage number nobody has
+  measured. There is no claimed-country counter here for that reason.
+- **The banner card on `/` is labelled as an example.** The repo's
+  `screenshots/` are still the untouched Solana Expo template, so there is no
+  real app screenshot to use.
+- The board opens honestly — `0007_mainnet_board_reset.sql` wipes the seeded
+  scenery, leaving 194 unclaimed and Turkey held by the treasury.
 
-The app itself runs the white Graphite palette. That is deliberate, not an
-inconsistency: the app keeps its nerve, the marketing carries the weather.
+## The one thing left to fill in
 
-## Before you edit the copy
+`site.store` in [`lib/site.ts`](lib/site.ts) points at the dApp Store's front
+door, because this repo has no record of the listing's address. Paste the real
+listing URL there and every store button on the site follows.
 
-Every product claim on this page traces to `cmo/00-product.md`,
-`cmo/02-positioning.md` and `cmo/06-voice.md` in the app repo. The constraints
-that shaped this page, so an edit does not quietly break one:
+## Regenerating from the app repo
 
-- The settlement path is **designed** to pay the displaced captain. It has not
-  been proven by a real mainnet takeover. Keep the design tense and keep the
-  caveat next to the table until a signature exists to link.
-- Never write *trustless*, *fully on-chain*, *decentralised*, *audited* or
-  *non-custodial*. Ownership is a row in a Postgres database; the chain is the
-  payment rail and the banner ledger. The page says so out loud, on purpose.
-- Never claim a push notification reaches a displaced captain. It does not.
-- Android and Seeker only. Never show or imply an iPhone.
-- No token, points, airdrop or snapshot — and no number we have not measured.
-  There is no claimed-country counter here because the seeded board is not real
-  data.
-- No competitor is named, anywhere.
-- The banner card is labelled as an example. Do not replace it with a
-  screenshot of the live map while the seed migration still ships.
-
-## Update the map
-
-If the app's map geometry changes, regenerate the SVG from the app repo:
+Both are checked into `scripts/` and refuse to write a short result:
 
 ```bash
-node -e '
-const fs = require("fs");
-const src = fs.readFileSync("../yurt.skr/src/data/worldMapGeometry.ts", "utf8");
-const body = src.slice(src.indexOf("export const COUNTRY_PATHS"));
-const re = /^\s{2}([A-Z]{2}):\s*"([^"]+)",$/gm;
-let m, out = [];
-while ((m = re.exec(body))) out.push(`<path id="c-${m[1]}" d="${m[2]}"/>`);
-fs.writeFileSync("assets/world.svg",
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 800" width="2000" height="800" role="img" aria-label="World map, 195 countries">
-<title>World map</title>
-<g fill="#0D1E2B" stroke="#1D3F47" stroke-width="0.9" stroke-linejoin="round">
-${out.join("\n")}
-</g>
-</svg>`);
-'
+npm run sync:countries   # lib/countries.ts        ← src/data/countries.ts
+npm run sync:map         # public/assets/world.svg ← src/data/worldMapGeometry.ts
 ```
+
+Both default to `../yurt.skr`; pass a path as the first argument otherwise.
+
+## Design
+
+One set of semantic tokens, two themes. Nothing below the token block in
+[`app/globals.css`](app/globals.css) names a colour directly, so a palette
+change is a change in one place.
+
+| Token | Light | Dark |
+| :--- | :--- | :--- |
+| `--bg` | `#FBFAF7` paper | `#04090F` |
+| `--raised` | `#F3F1EA` | `#0B1621` |
+| `--fg` / `--fg-2` / `--fg-3` | `#111A21` / `#3D4A53` / `#5C6970` | `#EBE6DC` / `#B9C4CC` / `#7D8D99` |
+| `--accent` | `#B04A17` | `#F0894E` |
+| `--link` | `#0E6E85` | `#6FD3E8` |
+
+The accent is **the price, and only the price** — one saturated element per
+composition. Both accents clear 4.5:1 on their own ground; the light theme is a
+nautical chart, not an inverted dark theme.
+
+Display **Fraunces**, data **IBM Plex Mono**, body **IBM Plex Sans**,
+self-hosted via `next/font`. The app itself runs a white "Graphite" theme
+(`src/constants/theme.ts`) — that contrast with the marketing surface is
+deliberate.
+
+### How the theme switch works
+
+- `:root` holds light. `@media (prefers-color-scheme: dark)` scoped to
+  `:root:not([data-theme="light"])` holds dark for readers who have not chosen.
+  `:root[data-theme="dark"]` lets an explicit choice win in both directions.
+- A tiny inline script in [`app/layout.tsx`](app/layout.tsx) reads
+  `localStorage.theme` **before the first paint**, so a reader who chose a theme
+  never sees the other one flash. `<html>` carries `suppressHydrationWarning`
+  because that script sets an attribute the server did not render.
+- [`components/ThemeToggle.tsx`](components/ThemeToggle.tsx) only supplies the
+  click. Which icon and which label are showing is decided in CSS off
+  `data-theme`, so the button is correct in the static HTML — before hydration,
+  and with JavaScript off it still reads as the current theme.
+- Until the reader chooses, the page keeps following the system, so a scheduled
+  OS theme change still moves it.
+
+`public/assets/world.svg` and `world-light.svg` are the same geometry (the app's
+own map — Natural Earth 1:110m, public domain, carrying no ownership state) in
+two palettes, because an `<img>`-referenced SVG cannot see the page's
+`data-theme`. The stylesheet picks between them with the `--map` custom property,
+and only the one in use is fetched. `npm run sync:map` writes both.
