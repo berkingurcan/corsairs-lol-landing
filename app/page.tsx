@@ -242,49 +242,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Straight answers ───────────────────────────────────── */}
-        <section id="plainly" className="band">
-          <div className="shell">
-            <header className="sec-head">
-              <p className="kicker">04 — Straight answers</p>
-              <h2>What this is, and what it is not.</h2>
-            </header>
-
-            <ul className="plain">
-              <li>
-                <h3>The server sets the price.</h3>
-                <p>
-                  The app never decides what a country costs. The price is computed and
-                  the transaction built server-side, then your wallet is asked to sign it
-                  — and the app checks those bytes against the quote before you do.
-                </p>
-              </li>
-              <li>
-                <h3>Ownership is a database row.</h3>
-                <p>
-                  The chain is the payment rail and the banner ledger. There is no custom
-                  on-chain program, so there is nothing to audit — and we are not going to
-                  call this trustless.
-                </p>
-              </li>
-              <li>
-                <h3>There is no token.</h3>
-                <p>
-                  No points, no season, no airdrop, no snapshot. The game is played in
-                  SOL, and the only thing to buy is a country.
-                </p>
-              </li>
-              <li>
-                <h3>Android and Seeker.</h3>
-                <p>
-                  The game signs with the Solana wallet on your phone, which means Android
-                  and Seeker today. There is no iOS build.
-                </p>
-              </li>
-            </ul>
-          </div>
-        </section>
-
         {/* ── Closer ─────────────────────────────────────────────── */}
         <section className="closer">
           <div className="shell closer-in">

@@ -22,7 +22,8 @@ export function SiteFooter() {
           {/* Static export, so this is the build year — which is the year the
               copy was last true anyway. */}
           © {new Date().getFullYear()} corsairs.lol · A mobile game for Solana Seeker
-          and Android. Every price on the board is real SOL on mainnet.
+          and Android. Every price on the board is real SOL on mainnet. Ownership is a
+          record on our server; the chain is the payment rail and the banner ledger.
         </p>
       </div>
     </footer>

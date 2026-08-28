@@ -331,9 +331,9 @@ h3 {
 
 /* ------------------------------------------------------------- row lists */
 
-/* Steps, the bidding aside and the plain list all sit on one grid, so their
-   headings share a single left edge from the top of the page to the bottom. */
-.steps li, .plain li, .aside {
+/* The steps and the bidding aside sit on one grid, so their headings share a
+   single left edge from the top of the page to the bottom. */
+.steps li, .aside {
   display: grid;
   grid-template-columns: 3.2rem minmax(0, 17rem) minmax(0, 1fr);
   gap: 0 clamp(16px, 3vw, 40px);
@@ -341,15 +341,15 @@ h3 {
   padding: 24px 0;
   border-top: 1px solid var(--line-soft);
 }
-.steps li:last-child, .plain li:last-child, .aside { border-bottom: 1px solid var(--line-soft); }
+.steps li:last-child, .aside { border-bottom: 1px solid var(--line-soft); }
 
-.steps, .plain { margin: 48px 0 0; padding: 0; list-style: none; }
+.steps { margin: 48px 0 0; padding: 0; list-style: none; }
 .step-n {
   font-family: var(--mono); font-size: 0.74rem;
   letter-spacing: 0.1em; color: var(--fg-3);
 }
-.steps h3, .plain h3, .aside h3 { grid-column: 2; }
-.steps p, .plain p, .aside p {
+.steps h3, .aside h3 { grid-column: 2; }
+.steps p, .aside p {
   grid-column: 3; margin: 0;
   font-size: 0.97rem; color: var(--fg-2); max-width: 54ch;
 }
@@ -357,11 +357,12 @@ h3 {
 .aside { margin: 40px 0 0; }
 
 @media (max-width: 760px) {
-  .steps li, .plain li, .aside { grid-template-columns: 3.2rem minmax(0, 1fr); }
-  .steps h3, .plain h3, .aside h3 { grid-column: 2; }
-  .steps p, .plain p, .aside p { grid-column: 2; margin-top: 8px; }
-  .plain li, .aside { grid-template-columns: 1fr; }
-  .plain h3, .aside h3, .plain p, .aside p { grid-column: 1; }
+  .steps li { grid-template-columns: 3.2rem minmax(0, 1fr); }
+  .steps h3 { grid-column: 2; }
+  .steps p { grid-column: 2; margin-top: 8px; }
+  /* The aside has no step number, so it collapses to a single column. */
+  .aside { grid-template-columns: 1fr; }
+  .aside h3, .aside p { grid-column: 1; }
 }
 
 /* ---------------------------------------------------------------- banner */

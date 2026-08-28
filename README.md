@@ -68,13 +68,15 @@ this page advertises a payout the chain does not make.
 
 - **Never** *trustless*, *fully on-chain*, *decentralised*, *audited* or
   *non-custodial*. Ownership is a row in Postgres; the chain is the payment rail
-  and the banner ledger. The page says so out loud, on purpose.
+  and the banner ledger. The footer line says so out loud, on purpose: it is the
+  page's whole disclosure now that the "Straight answers" section is gone, so do
+  not quietly drop it.
 - **No push notifications exist.** There is no `notificationService`. A
   displaced captain sees it in Profile next time they open the app. Never imply
   something reaches their phone.
 - **Android and Seeker only.** Mobile Wallet Adapter has no iOS implementation.
-  That is the reason; the page states the consequence — "There is no iOS
-  build" — without the acronym.
+  That is the reason, and it never appears in the copy. The footer states the
+  consequence instead — "A mobile game for Solana Seeker and Android."
 - **Nothing links to a download.** There is no dApp Store listing URL and no
   public repo, so every call to action on the site points at
   [`site.x`](lib/site.ts), the one destination that exists. Do not reintroduce a
