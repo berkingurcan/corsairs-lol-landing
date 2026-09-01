@@ -1,0 +1,437 @@
+/**
+ * The board.
+ *
+ * Border light. Graphite's map is a near-white ocean under pale land, read by
+ * its fills; on this ground that is a lightbox. Inverted, unclaimed land sits
+ * a hair above the page and is read entirely by its LIT coastline — which is
+ * BRAND.md rule 7, "map drama comes from country boundaries", arrived at from
+ * the other side. Claimed land takes its owner's hue at full opacity and its
+ * boundary goes DARK, so two adjacent owners separate by a seam instead of
+ * sharing a highlight.
+ *
+ * Every stroke is `non-scaling-stroke`: a coastline is a hairline at 1x and a
+ * hairline at 64x, because it is a line on a chart and not a wall with a
+ * thickness.
+ */
+
+/* ------------------------------------------------------------------- stage */
+
+.ab-map { position: absolute; inset: 0; }
+
+.ab-map-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* The browser must not pan the page while a finger is panning the board. */
+  touch-action: none;
+  cursor: grab;
+}
+.ab-map-svg:active { cursor: grabbing; }
+.ab-map-svg:focus-visible { outline: 2px solid var(--c-text); outline-offset: -2px; }
+
+.ab-map-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--m-ocean);
+}
+
+/* -------------------------------------------------------------------- land */
+
+/* Antarctica and other non-sovereign terrain: visible, never selectable. */
+.ab-map-neutral {
+  fill: var(--m-neutral-land);
+  stroke: none;
+  pointer-events: none;
+}
+
+.ab-map-country {
+  fill: var(--m-unclaimed);
+  stroke: var(--m-divider);
+  stroke-width: 0.6;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  transition: stroke .12s ease, opacity .18s ease;
+}
+
+/* Claimed land is the lit thing now, so its boundary stops being the light
+   and becomes the seam that keeps two owners apart. */
+.ab-map-country.is-claimed {
+  stroke: var(--m-rival-stroke);
+  stroke-width: 0.75;
+}
+
+.ab-map-country.is-mine {
+  stroke: var(--m-mine-stroke);
+  stroke-width: 1.25;
+  /* Dashed, and that is the whole point.
+     Selection and ownership were both "outlined in silver", which made the
+     country you had picked indistinguishable from the nine you already own —
+     Graphite has the same collision on white and resolves it only with the
+     halo. Differing in KIND rather than in weight settles it: a dash reads as
+     a standing claim, a solid ring reads as a cursor, and solid wins at a
+     glance. `non-scaling-stroke` keeps the dash the same length at 1x and at
+     64x, so it never degenerates into a dotted line. */
+  stroke-dasharray: 3 2.5;
+}
+
+.ab-map-country:hover {
+  stroke: var(--m-selection);
+  stroke-width: 1.25;
+  stroke-dasharray: none;
+}
+
+/* What the active lens excludes. Dimmed rather than hidden: a country you
+   filtered out is still a country, and a board with holes in it stops being
+   a map. */
+.ab-map-country.is-dimmed,
+.ab-map-beacon.is-dimmed {
+  opacity: var(--m-dimmed-opacity);
+}
+
+/* The 28 micro-states have no polygon at 1:110m — see lib/map/markers.ts.
+   A beacon rather than an invented outline: a shape that is not the country's
+   shape is worse than an honest dot. */
+.ab-map-beacon {
+  fill: var(--m-unclaimed);
+  stroke: var(--m-divider);
+  stroke-width: 0.9;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  transition: stroke .12s ease, opacity .18s ease;
+}
+.ab-map-beacon.is-claimed { stroke: var(--m-rival-stroke); }
+.ab-map-beacon.is-mine { stroke: var(--m-mine-stroke); stroke-dasharray: 3 2.5; }
+.ab-map-beacon:hover { stroke: var(--m-selection); stroke-width: 1.4; stroke-dasharray: none; }
+
+/* The selection, drawn last and on top — twice.
+   The casing is Graphite's `selectionHalo`, inverted. Its stated reason (a
+   black ring must survive a bright fill) does not carry over, but its unstated
+   one does: without a casing, "selected" and "yours" are both a silver outline
+   and neither wins. The dark cut around the ring is what separates them. */
+.ab-map-ring-casing {
+  fill: none;
+  stroke: var(--m-selection-halo);
+  stroke-width: 5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.ab-map-ring {
+  fill: none;
+  stroke: var(--m-selection);
+  stroke-width: 2.25;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+/* --------------------------------------------------------------------- hud */
+
+.ab-map-hud {
+  position: absolute;
+  inset: auto var(--s-lg) var(--s-lg);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-md);
+  pointer-events: none;
+}
+.ab-map-hud > * { pointer-events: auto; }
+
+.ab-hover {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s-sm);
+  padding: var(--s-sm) var(--s-md);
+  background: var(--c-surface);
+  border: var(--hairline) solid var(--c-border);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-sm);
+  color: var(--c-text-secondary);
+}
+.ab-hover b {
+  font-family: var(--f-mono);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-label);
+  color: var(--c-text);
+}
+.ab-hover-open { color: var(--c-text-muted); }
+
+.ab-zoom {
+  display: flex;
+  align-items: center;
+  gap: var(--s-xxs);
+  padding: var(--s-xxs);
+  background: var(--c-surface);
+  border: var(--hairline) solid var(--c-border);
+  border-radius: var(--r-pill);
+}
+.ab-zoom button {
+  width: var(--t-pointer);
+  height: var(--t-pointer);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--c-text-secondary);
+  font-family: var(--f-mono);
+  font-size: var(--fs-lg);
+  cursor: pointer;
+}
+.ab-zoom button:hover { background: var(--c-surface-sunken); color: var(--c-text); }
+.ab-zoom-level {
+  min-width: 46px;
+  text-align: center;
+  font-family: var(--f-mono);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text-muted);
+}
+.ab-zoom-reset {
+  width: auto !important;
+  padding-inline: var(--s-md);
+  font-family: var(--f-sans) !important;
+  font-size: var(--fs-sm) !important;
+}
+
+/* ---------------------------------------------------------------- overlays */
+
+.ab-board-topleft {
+  position: absolute;
+  top: var(--s-lg);
+  left: var(--s-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--s-sm);
+  flex-wrap: wrap;
+}
+
+.ab-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s-xs);
+  padding: var(--s-sm) var(--s-md);
+  background: var(--c-surface);
+  border: var(--hairline) solid var(--c-border);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}
+/* The figure, and the only thing in the pill that is one. */
+.ab-stat b {
+  font-family: var(--f-mono);
+  font-weight: var(--fw-black);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text);
+}
+
+.ab-lens {
+  display: flex;
+  gap: var(--s-xxs);
+  padding: var(--s-xxs);
+  background: var(--c-surface);
+  border: var(--hairline) solid var(--c-border);
+  border-radius: var(--r-pill);
+}
+
+.ab-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-sm);
+  height: var(--t-pointer);
+  padding-inline: var(--s-md);
+  border: 0;
+  border-radius: var(--r-pill);
+  background: none;
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--c-text-muted);
+  cursor: pointer;
+  transition: background-color .14s ease, color .14s ease;
+}
+.ab-chip:hover:not(:disabled) { color: var(--c-text); background: var(--c-surface-sunken); }
+.ab-chip.is-on { color: var(--c-text-inverse); background: var(--c-primary); }
+.ab-chip:disabled { color: var(--c-text-disabled); cursor: default; }
+
+.ab-board-search {
+  position: absolute;
+  top: var(--s-lg);
+  right: var(--s-lg);
+  background: var(--c-surface);
+  border: var(--hairline) solid var(--c-border);
+}
+.ab-board-search kbd {
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  color: var(--c-text-disabled);
+  border: var(--hairline) solid var(--c-border);
+  border-radius: var(--r-sm);
+  padding: 1px 5px;
+}
+
+/* ------------------------------------------------------------------ search */
+
+.ab-search-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  padding-top: 12vh;
+  background: var(--c-overlay);
+}
+
+.ab-search {
+  width: min(520px, calc(100vw - 2 * var(--s-lg)));
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--c-surface-alt);
+  border: var(--hairline) solid var(--c-border-strong);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.ab-search-input {
+  padding: var(--s-lg) var(--s-xl);
+  border: 0;
+  border-bottom: var(--hairline) solid var(--c-border);
+  background: none;
+  color: var(--c-text);
+  font-family: inherit;
+  font-size: var(--fs-lg);
+}
+.ab-search-input::placeholder { color: var(--c-text-disabled); }
+.ab-search-input:focus { outline: none; }
+
+.ab-search-list {
+  margin: 0;
+  padding: var(--s-xs);
+  list-style: none;
+  overflow-y: auto;
+}
+
+.ab-search-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-md);
+  width: 100%;
+  padding: var(--s-sm) var(--s-md);
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--c-text-secondary);
+  font-family: inherit;
+  font-size: var(--fs-md);
+  text-align: left;
+  cursor: pointer;
+}
+/* One highlight, driven by the keyboard cursor — pointer entry moves the
+   cursor rather than lighting a second row, so there is never a hover and an
+   arrow-key selection disagreeing about what Enter will do. */
+.ab-search-row.is-cursor { background: var(--c-surface-sunken); color: var(--c-text); }
+.ab-search-flag { font-size: var(--g-row); line-height: 1; }
+.ab-search-name { flex: 1; min-width: 0; }
+.ab-search-empty {
+  padding: var(--s-xl);
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}
+
+/* --------------------------------------------------------------- inspector */
+
+.ab-owner-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: var(--r-pill);
+  margin-right: var(--s-sm);
+  vertical-align: baseline;
+}
+
+.ab-panel-empty { display: flex; flex-direction: column; gap: var(--s-md); }
+
+.ab-inspector { display: flex; flex-direction: column; gap: var(--s-xxl); }
+
+.ab-insp-head { display: flex; align-items: flex-start; gap: var(--s-md); }
+.ab-insp-head .ab-stack { flex: 1; min-width: 0; }
+.ab-insp-head .ab-flag { margin: 0; line-height: 1; }
+
+.ab-tag {
+  flex: none;
+  padding: var(--s-xs) var(--s-md);
+  border: var(--hairline) solid var(--c-border);
+  border-radius: var(--r-pill);
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+/* Semantic colour marks a VALUE, never a panel fill. "Yours" is the one state
+   worth a colour here, and it takes the text rather than the chip. */
+.ab-tag.is-mine { color: var(--c-success); border-color: var(--c-success); }
+
+/* The banner card stays white on a dark board, exactly as it is white on the
+   phone's light one. The argument was never about the page: an opaque surface
+   means black type at one contrast ratio over all six owner fills instead of
+   seven, and it is what makes the thing read as a placement someone paid for
+   rather than as a label printed into the map. */
+.ab-banner {
+  margin: 0;
+  padding: var(--s-lg);
+  background: var(--m-banner-surface);
+  border: var(--hairline) solid var(--m-banner-border);
+  border-radius: var(--r-sm);
+}
+.ab-banner-title {
+  font-family: var(--f-display);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-lg);
+  letter-spacing: var(--ls-heading);
+  color: var(--m-banner-label);
+}
+.ab-banner-tagline {
+  margin-top: var(--s-sm) !important;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--m-banner-label);
+}
+.ab-banner-link {
+  margin-top: var(--s-md) !important;
+  font-family: var(--f-mono);
+  font-size: var(--fs-sm);
+  color: var(--m-banner-link);
+}
+
+.ab-facts { margin: 0; display: flex; flex-direction: column; gap: var(--s-md); }
+.ab-facts > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-md);
+  padding-bottom: var(--s-md);
+  border-bottom: var(--hairline) solid var(--c-border);
+}
+.ab-facts > div:last-child { border-bottom: 0; padding-bottom: 0; }
+.ab-facts dd { margin: 0; text-align: right; }
+
+.ab-stub-inline { min-height: 0; padding: var(--s-lg); }
+
+/* ------------------------------------------------------------------ narrow */
+
+@media (max-width: 860px) {
+  .ab-board-topleft { top: var(--s-md); left: var(--s-md); }
+  .ab-board-search { top: var(--s-md); right: var(--s-md); }
+  .ab-board-search kbd { display: none; }
+  .ab-map-hud { inset: auto var(--s-md) var(--s-md); }
+  /* The hover chip needs a pointer to have a point. */
+  .ab-hover { display: none; }
+}

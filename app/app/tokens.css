@@ -107,11 +107,21 @@ body:has(.app-root) {
   --m-mine-stroke: #F3F3F0;
   /** Outline on a rival's. A dark seam, so adjacent owner fills separate. */
   --m-rival-stroke: rgb(5 6 6 / 0.55);
-  /** Ring around the selected country. The brightest thing on the board.
-      Graphite's `selectionHalo` is deliberately dropped: it existed so a black
-      ring survived a bright fill, and a highlight ring on a dark board does
-      not need one. */
+  /** Ring around the selected country. The brightest thing on the board. */
   --m-selection: #F3F3F0;
+  /**
+   * Laid UNDER the selection ring, and the polarity is the inversion's.
+   *
+   * Graphite's halo is white because a black ring on a dark owner fill is
+   * invisible without it. That reason genuinely does not survive — a silver
+   * ring on a dark board needs no help being seen — but the halo was doing a
+   * second job nobody wrote down: separating the ring from everything around
+   * it. Without it, a selected country and a country the viewer owns are both
+   * "outlined in silver" and read as the same signal at a glance. So the halo
+   * comes back as the ground colour, and the ring's dark casing is what says
+   * SELECTED rather than merely MINE.
+   */
+  --m-selection-halo: #050606;
   /** Fallback fill for a claimed territory with no colour set. */
   --m-claimed-fallback: #70A1FF;
   /** Antarctica and other non-sovereign terrain: visible, never selectable. */

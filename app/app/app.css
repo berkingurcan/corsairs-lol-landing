@@ -317,9 +317,6 @@ body:has(.app-root) .skip {
 .ab-stub p { max-width: 46ch; font-size: var(--fs-sm); }
 .ab-stub .ab-btn { margin-top: var(--s-sm); }
 
-/* The inspector's empty state, which is a real state and not a stub. */
-.ab-empty p { margin-top: var(--s-md); }
-
 /* A flag as the subject of a page, set on the glyph scale rather than the
    type scale — a flag is not type. */
 .ab-flag { font-size: var(--g-feature); margin-right: var(--s-md); }
