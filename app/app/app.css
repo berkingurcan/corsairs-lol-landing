@@ -378,3 +378,36 @@ body:has(.app-root) .skip {
 @media (max-width: 420px) {
   .ab-lockup span { display: none; }
 }
+
+/* ---------------------------------------------------------------- wallet */
+
+.ab-wallet { position: relative; }
+
+/* The wallet's own colour, and the colour its countries carry on the board. */
+.ab-wallet-dot {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: var(--r-pill);
+}
+
+.ab-pop {
+  position: absolute;
+  top: calc(100% + var(--s-sm));
+  right: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-lg);
+  width: 260px;
+  padding: var(--s-xl);
+  background: var(--c-surface-alt);
+  border: var(--hairline) solid var(--c-border-strong);
+  border-radius: var(--r-lg);
+  /* The one shadow in the interface, and not for depth: it stops the panel
+     from dissolving into the board's lit coastlines directly behind it. */
+  box-shadow: 0 20px 40px -16px rgb(0 0 0 / 0.9);
+}
+
+/* The full address, which is 44 characters and must not widen the panel. */
+.ab-wallet-full { overflow-wrap: anywhere; line-height: 1.35; }
