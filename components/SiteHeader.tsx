@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { Mark } from "./Mark";
 import { ThemeToggle } from "./ThemeToggle";
-import { site } from "@/lib/site";
 
 const links = [
   { href: "/#how", label: "How it works" },
@@ -29,9 +28,14 @@ export function SiteHeader() {
 
         <div className="nav-end">
           <ThemeToggle />
-          <a className="btn btn-ghost nav-cta" href={site.x} rel="noopener">
-            Follow on X
-          </a>
+          {/* The board takes the header's one CTA slot, because it is the only
+              thing up here that is a destination rather than a section. X keeps
+              the solid button in the hero and the closer, and its own line in
+              the footer — it loses the header, not its prominence. The full
+              hierarchy swap comes when the board has real data behind it. */}
+          <Link className="btn btn-ghost nav-cta" href="/app">
+            Open the app
+          </Link>
         </div>
       </div>
     </header>

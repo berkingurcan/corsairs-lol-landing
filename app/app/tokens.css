@@ -1,0 +1,220 @@
+/**
+ * Dark Bridge — the web dApp's design tokens.
+ *
+ * A mirror of `src/constants/theme.ts` in the app repo, section for section.
+ * Everything that governs PROPORTION — radius, the 4px grid, the type scale,
+ * weights, tracking — is that file's value verbatim. Only COLOUR is replaced,
+ * with the campaign system's near-black and silver, so the walk from the
+ * marketing page into the product does not cross a seam.
+ *
+ * That colour-only divergence is the contract. Two clients on one design
+ * system stays affordable exactly as long as it holds: the moment a radius or
+ * a type step differs here, there are two design systems and no way to correct
+ * either one once. If a proportion below needs to change, change it in
+ * theme.ts first and copy the result down.
+ *
+ * Scoped to `.app-root`, not `:root`, because the marketing pages in this same
+ * deploy run their own two-theme token set out of globals.css and the two must
+ * not collide. `body:has(.app-root)` carries the same set so the site-wide skip
+ * link — a sibling of the shell, not a child — can be dressed in it too.
+ *
+ * Every token here is used — a token nobody reads is a rule nobody follows,
+ * and theme.ts deletes them on sight. That sweep happens once the screens
+ * exist, not during the build: the map block, the owner ramp and the danger,
+ * warning and overlay values are the contract steps 3 through 6 are written
+ * against, and deleting them now only means guessing at them again later.
+ * Anything still unreferenced when step 6 ships goes.
+ */
+
+.app-root,
+body:has(.app-root) {
+  /* ──── Palette ────
+     Campaign ground and silver. Graphite's structure with its values inverted:
+     the interface's one anchor is still a single high-contrast fill against a
+     flat field, it is simply silver-on-black rather than black-on-white. */
+
+  /** App background. The board's ocean is this same value — it has no edge. */
+  --c-bg: #050606;
+  /** Panels, sheets, bars. Separation is tone and hairline, never shadow. */
+  --c-surface: #0C0E0E;
+  /** Recessed fills: inputs, chips, empty states. */
+  --c-surface-alt: #101212;
+  /** One step deeper: pressed chips, disabled buttons. */
+  --c-surface-sunken: #171919;
+
+  /* Hairlines are silver at low alpha rather than a fixed grey, so they hold
+     over a panel and over an owner colour at the same weight. */
+  --c-border: rgb(216 218 216 / 0.13);
+  --c-border-strong: rgb(216 218 216 / 0.26);
+
+  --c-text: #F3F3F0;            /* 18.0:1 on ground */
+  --c-text-secondary: #B4B8B6;  /* 10.1:1 */
+  --c-text-muted: #8D9191;      /*  6.4:1 */
+  --c-text-disabled: #686C6C;   /*  3.8:1 — disabled only, never live copy */
+  /** Text and icons on top of `--c-primary`. */
+  --c-text-inverse: #050606;
+
+  /** Primary action. Silver button, near-black label. */
+  --c-primary: #F3F3F0;
+  --c-primary-pressed: #D8DAD8;
+  --c-on-primary: #050606;
+
+  /* There is deliberately no accent token. BRAND.md rule 2 bans a saturated
+     campaign accent, so hierarchy in the chrome comes from silver value and
+     space alone — including links, which are underlined rather than coloured.
+     The one exception is the banner card, which is a white object and keeps
+     Graphite's link blue; it lives in the map block below. */
+
+  /* Semantic colour marks a VALUE — never a panel fill, or it stops meaning
+     anything. Lifted off Graphite's originals, which sit near 4:1 here: that
+     is legible for a word and not for the thin figure beside it. */
+  --c-success: #5BC386;  /* 9.27:1 */
+  --c-danger: #FF513A;   /* 6.27:1 */
+  --c-warning: #DCAF63;  /* 10.00:1 */
+
+  /** Modal scrim. Deeper than Graphite's 0.44 — a dark scrim over a dark
+      board needs more separation to read as a layer at all. */
+  --c-overlay: rgb(0 0 0 / 0.62);
+
+  /* ──── Owner ramp ────
+     `ownerColor.ts`'s six hues, re-derived in OKLab against this ground: hue
+     held exactly, chroma pulled 8%, lightness re-pinned to one value. The
+     original rule — a narrow band "so no owner shouts louder than another",
+     and never the red, green, amber or link blue used for state — is what
+     survives; its band was measured against white. All six sit at L 0.716–
+     0.721 and 7.6–8.5:1 here. Order is unchanged, so `colorForAddress()`
+     assigns a wallet the same slot in both clients. */
+  --owner-blue: #70A1FF;     /* was #3D6DD8 · 7.95:1 */
+  --owner-violet: #AD8FF7;   /* was #8461CE · 7.78:1 */
+  --owner-magenta: #E67CB4;  /* was #B94A88 · 7.64:1 */
+  --owner-rust: #E38B58;     /* was #C2662A · 7.83:1 */
+  --owner-teal: #5EB5B5;     /* was #1E8B8B · 8.46:1 */
+  --owner-olive: #93B25C;    /* was #71902F · 8.47:1 */
+
+  /* ──── Map ────
+     Kept apart so the board can be tuned independently, as on the phone.
+     The fills invert into border light: land is a hair above the ground and
+     is read by its lit coastline, which is BRAND.md rule 7 exactly. What does
+     not invert is the RATIO between a land mass and its boundary. */
+
+  /** Water. The page ground itself — the board has no edge. */
+  --m-ocean: #050606;
+  /** Land nobody owns yet. Barely above ground; the coastline does the work. */
+  --m-unclaimed: #0F1213;
+  /** The lit boundary between countries. Drawn as a non-scaling stroke. */
+  --m-divider: rgb(216 218 216 / 0.30);
+  /** Outline on a territory the connected wallet owns. */
+  --m-mine-stroke: #F3F3F0;
+  /** Outline on a rival's. A dark seam, so adjacent owner fills separate. */
+  --m-rival-stroke: rgb(5 6 6 / 0.55);
+  /** Ring around the selected country. The brightest thing on the board.
+      Graphite's `selectionHalo` is deliberately dropped: it existed so a black
+      ring survived a bright fill, and a highlight ring on a dark board does
+      not need one. */
+  --m-selection: #F3F3F0;
+  /** Fallback fill for a claimed territory with no colour set. */
+  --m-claimed-fallback: #70A1FF;
+  /** Antarctica and other non-sovereign terrain: visible, never selectable. */
+  --m-neutral-land: #0A0C0C;
+  /** Applied to territories the active filter excludes. */
+  --m-dimmed-opacity: 0.22;
+
+  /* Banner cards drawn on the board. These are advertisements someone paid
+     for, not cartographic labels, so they are opaque cards rather than halo'd
+     type — black on white over all six owner fills at one contrast ratio
+     instead of seven. That argument is about the fills underneath, not the
+     page, so it survives the inversion unchanged and the card stays white. */
+  --m-banner-surface: #FFFFFF;
+  --m-banner-border: rgb(17 19 24 / 0.14);
+  --m-banner-label: #111318;
+  --m-banner-link-surface: rgb(255 255 255 / 0.94);
+  --m-banner-link: #1B4FBF;
+
+  /* ──── Typography ────
+     The one replacement outside colour, and the point of the bridge: the
+     campaign's three faces instead of the platform's system font. Roles are
+     unchanged — display, body, data. */
+  --f-display: var(--font-display), Georgia, "Times New Roman", serif;
+  --f-sans: var(--font-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /** Type scale, verbatim. Body is 15; below 13 is for labels only. */
+  --fs-xs: 11px;
+  --fs-sm: 13px;
+  --fs-md: 15px;
+  --fs-lg: 17px;
+  --fs-xl: 20px;
+  --fs-xxl: 24px;
+  --fs-display: 32px;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+  /** NUMBERS ONLY — prices, counts, balances. Headings stop at bold. One
+      weight has to be the loudest, and in a game about what things cost it is
+      the figure, not the label above it. */
+  --fw-black: 800;
+
+  /** Tracking, in px against the size it is applied at, as on the phone. */
+  --ls-display: -1px;
+  --ls-heading: -0.5px;
+  --ls-body: -0.1px;
+  /** Uppercase micro-labels need the opposite treatment. */
+  --ls-label: 0.6px;
+
+  /* Line heights have no counterpart in theme.ts — React Native leaves them
+     to the platform and CSS does not. Two values, kept deliberately few. */
+  --lh-tight: 1.24;
+  --lh-body: 1.5;
+
+  /* ──── Spacing (4px grid) ──── */
+  --s-xxs: 2px;
+  --s-xs: 4px;
+  --s-sm: 8px;
+  --s-md: 12px;
+  --s-lg: 16px;
+  --s-xl: 20px;
+  --s-xxl: 24px;
+  --s-xxxl: 32px;
+  --s-huge: 48px;
+
+  /* ──── Radius ────
+     Three values, one per role. Five radii is five different opinions about
+     how round the product is. */
+  --r-sm: 8px;    /* controls: chips, inputs, swatches, icon buttons, badges */
+  --r-lg: 16px;   /* surfaces: panels, sheets, tiles */
+  --r-pill: 999px;
+
+  /* ──── Icon and glyph ──── */
+  --i-sm: 16px;
+  --i-md: 20px;
+  --i-lg: 24px;
+  --g-row: 24px;      /* a flag in a list row */
+  --g-feature: 32px;  /* a flag as the subject of a panel */
+
+  /* ──── Hit targets ────
+     48px is Android's guidance and it holds for touch. A pointer is precise
+     enough for a 32px control, so the web adds a smaller visual size with the
+     hit box kept at 44 via padding — the control shrinks, the target does not. */
+  --t-min: 48px;
+  --t-button: 52px;
+  --t-button-sm: 40px;
+  --t-pointer: 32px;
+  --t-pointer-hit: 44px;
+
+  --hairline: 1px;
+
+  /* ──── Elevation ────
+     Graphite separates surfaces with tone and hairline rather than shadow,
+     and on near-black a shadow is invisible — so the sheet's one exception
+     does not translate. A raised surface is `--c-surface` against `--c-bg`
+     plus a hairline; nothing here casts. The single shadow below is a scrim
+     under the mobile sheet, doing the job the fill cannot: hiding the board's
+     lit coastlines directly behind the sheet's top edge. */
+  --e-sheet: 0 -24px 40px -12px rgb(0 0 0 / 0.85);
+
+  /* ──── Shell metrics ──── */
+  --bar-h: 56px;
+  --tabs-h: 0px;
+}

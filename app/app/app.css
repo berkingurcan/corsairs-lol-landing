@@ -1,0 +1,380 @@
+/**
+ * The app shell and its primitives.
+ *
+ * Every class here is prefixed `ab-` (app / Dark Bridge). The marketing pages
+ * in this deploy ship their own unprefixed classes out of globals.css, and the
+ * two stylesheets are both loaded on `/app` — the prefix is what keeps a
+ * `.btn` here from inheriting a `.btn` there by accident of cascade order.
+ *
+ * Nothing below names a colour, size or radius directly. If a literal appears
+ * in this file it is a token that was never added to tokens.css.
+ */
+
+/* ------------------------------------------------------------------ ground */
+
+/* The app commits to one theme. globals.css paints `body` from the marketing
+   token set, which follows the reader's OS, so on these routes the ground is
+   re-declared rather than inherited — otherwise a light-mode reader gets a
+   near-black shell sitting on chart paper wherever the shell does not reach
+   (overscroll, a viewport taller than the content). */
+body:has(.app-root) {
+  background: var(--c-bg);
+  color-scheme: dark;
+}
+
+/* globals.css dresses the skip link from the marketing palette, which lands a
+   chart-paper chip on a near-black page for anyone whose OS is in light mode.
+   It is the one element of the site chrome that reaches into these routes. */
+body:has(.app-root) .skip {
+  background: var(--c-surface);
+  color: var(--c-text);
+  border-color: var(--c-border-strong);
+  border-radius: var(--r-sm);
+}
+
+.app-root {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+  min-height: 100svh;
+  background: var(--c-bg);
+  color: var(--c-text-secondary);
+  font-family: var(--f-sans);
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+}
+
+.app-root ::selection { background: var(--c-text); color: var(--c-bg); }
+
+.app-root :focus-visible {
+  outline: 2px solid var(--c-text);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* ------------------------------------------------------------------- type */
+
+/* Headings stop at bold. 800 is reserved for figures — see `--fw-black`. The
+   selectors are scoped rather than bare so they out-rank globals.css's
+   `h1, h2, h3` rule, which sets the marketing weight of 900. */
+.app-root h1,
+.app-root h2,
+.app-root h3 {
+  margin: 0;
+  color: var(--c-text);
+  font-family: var(--f-display);
+  font-weight: var(--fw-bold);
+  font-variation-settings: "opsz" 24, "WONK" 1;
+  line-height: var(--lh-tight);
+  text-wrap: balance;
+}
+.app-root h1 { font-size: var(--fs-display); letter-spacing: var(--ls-display); font-variation-settings: "opsz" 32, "WONK" 1; }
+.app-root h2 { font-size: var(--fs-xxl); letter-spacing: var(--ls-heading); }
+.app-root h3 { font-size: var(--fs-lg); letter-spacing: var(--ls-body); }
+
+.app-root p { margin: 0; }
+
+/* Links carry no colour: the chrome has no accent, so a link is text with a
+   rule under it. */
+.app-root a { color: inherit; text-decoration: none; }
+
+/** Uppercase micro-label above a value. */
+.ab-label {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+/** A figure in a row: price, count. Tabular, so columns line up. */
+.ab-value {
+  font-family: var(--f-mono);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-bold);
+  color: var(--c-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/** The one big number on a screen. The only place weight 800 appears. */
+.ab-figure {
+  font-family: var(--f-mono);
+  font-size: var(--fs-display);
+  font-weight: var(--fw-black);
+  letter-spacing: var(--ls-display);
+  color: var(--c-text);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--lh-tight);
+}
+
+/** Wallet addresses and signatures. */
+.ab-mono {
+  font-family: var(--f-mono);
+  font-size: var(--fs-sm);
+  color: var(--c-text-secondary);
+}
+
+.ab-muted { color: var(--c-text-muted); }
+.ab-caption { font-size: var(--fs-sm); color: var(--c-text-muted); }
+
+/* ------------------------------------------------------------------- bar */
+
+.ab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: var(--s-xxl);
+  height: var(--bar-h);
+  padding-inline: var(--s-lg);
+  /* Graphite's bars are `surface`, separated from the ground by tone and a
+     hairline. On white those two values were identical; here the rule finally
+     has something to do. */
+  background: var(--c-surface);
+  border-bottom: var(--hairline) solid var(--c-border);
+}
+
+/* The phone app is headerless on purpose — a wordmark has no job once the app
+   is open, and 52dp of chrome is a real cost on a 6.67" panel. A browser tab
+   already spends that space on someone else's chrome and has none of its own
+   to navigate with, so the bar stays. What generalises from that note is the
+   restraint: one wallet control, and nothing else that is not a destination. */
+.ab-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-sm);
+  flex: none;
+  color: var(--c-text);
+  font-family: var(--f-display);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-lg);
+  letter-spacing: -0.04em;
+  font-variation-settings: "opsz" 20, "WONK" 1;
+}
+.ab-lockup svg { width: var(--i-md); height: var(--i-md); flex: none; }
+
+.ab-nav { display: flex; align-items: center; gap: var(--s-xs); }
+.ab-nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-sm);
+  height: var(--t-pointer);
+  padding-inline: var(--s-md);
+  border-radius: var(--r-pill);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--c-text-muted);
+  transition: color .14s ease, background-color .14s ease;
+}
+.ab-nav a:hover { color: var(--c-text); background: var(--c-surface-alt); }
+.ab-nav a[aria-current="page"] { color: var(--c-text); background: var(--c-surface-sunken); }
+.ab-nav svg { width: var(--i-sm); height: var(--i-sm); }
+
+.ab-bar-end { display: flex; align-items: center; gap: var(--s-sm); margin-left: auto; }
+
+/* Network is a fact, not a status to act on, so it is a label rather than a
+   control. It says mainnet because every price on the board is real SOL. */
+.ab-net {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-sm);
+  height: var(--t-pointer);
+  padding-inline: var(--s-md);
+  border: var(--hairline) solid var(--c-border);
+  border-radius: var(--r-pill);
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+.ab-net::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: var(--c-success);
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.ab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-sm);
+  height: var(--t-button-sm);
+  padding-inline: var(--s-lg);
+  border: var(--hairline) solid transparent;
+  border-radius: var(--r-pill);
+  background: none;
+  font-family: inherit;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-body);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .14s ease, border-color .14s ease, color .14s ease;
+}
+.ab-btn svg { width: var(--i-sm); height: var(--i-sm); }
+
+.ab-btn-primary { background: var(--c-primary); color: var(--c-on-primary); }
+.ab-btn-primary:hover:not(:disabled) { background: var(--c-primary-pressed); }
+
+.ab-btn-ghost { border-color: var(--c-border-strong); color: var(--c-text); }
+.ab-btn-ghost:hover:not(:disabled) { background: var(--c-surface-alt); }
+
+.ab-btn:disabled { cursor: default; }
+.ab-btn-primary:disabled,
+.ab-btn-ghost:disabled {
+  background: var(--c-surface-sunken);
+  border-color: transparent;
+  color: var(--c-text-disabled);
+}
+
+/** The one action a primary surface gets: full width, at touch height. */
+.ab-btn-block { width: 100%; height: var(--t-button); font-size: var(--fs-md); }
+
+/* --------------------------------------------------------------- surfaces */
+
+.ab-panel {
+  background: var(--c-surface);
+  border: var(--hairline) solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: var(--s-xl);
+}
+
+/* A row of label-over-value pairs, which is most of what this app displays. */
+.ab-stack { display: flex; flex-direction: column; gap: var(--s-xxs); }
+.ab-grid { display: grid; gap: var(--s-lg); }
+
+.ab-rule { height: var(--hairline); background: var(--c-border); border: 0; margin: 0; }
+
+/* ------------------------------------------------------------------ pages */
+
+.ab-main { display: flex; flex-direction: column; min-height: 0; }
+
+/** A scrolling read-only surface: activity, holdings, a country page. */
+.ab-page {
+  width: 100%;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding: var(--s-xxxl) var(--s-lg) var(--s-huge);
+}
+
+.ab-page-head { margin-bottom: var(--s-xxl); }
+.ab-page-head p { margin-top: var(--s-sm); max-width: 62ch; color: var(--c-text-muted); font-size: var(--fs-sm); }
+
+/* ------------------------------------------------------------------ board */
+
+/* The map fills what the bar leaves. On a wide screen the phone's bottom
+   sheet becomes a persistent inspector: there is no reason to hide a country
+   behind a sheet here, and keeping it mounted makes selecting a second country
+   a content swap rather than a dismiss-and-present. */
+.ab-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  height: calc(100svh - var(--bar-h) - var(--tabs-h));
+}
+.ab-board-canvas { position: relative; min-width: 0; background: var(--m-ocean); }
+.ab-board-canvas .ab-stub { height: auto; margin: var(--s-lg); }
+.ab-board-side {
+  border-left: var(--hairline) solid var(--c-border);
+  background: var(--c-surface);
+  overflow-y: auto;
+  padding: var(--s-xl);
+}
+
+/* --------------------------------------------------------------- skeleton */
+
+/* Phase 1 placeholders. Each says what lands here and in which step, so a
+   route that renders empty is legible rather than broken. Deleted as the
+   step that fills it ships. */
+.ab-stub {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--s-md);
+  height: 100%;
+  min-height: 240px;
+  padding: var(--s-xxxl);
+  border: var(--hairline) dashed var(--c-border-strong);
+  border-radius: var(--r-lg);
+  color: var(--c-text-muted);
+}
+.ab-stub-step {
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--c-text-disabled);
+}
+.ab-stub p { max-width: 46ch; font-size: var(--fs-sm); }
+.ab-stub .ab-btn { margin-top: var(--s-sm); }
+
+/* The inspector's empty state, which is a real state and not a stub. */
+.ab-empty p { margin-top: var(--s-md); }
+
+/* A flag as the subject of a page, set on the glyph scale rather than the
+   type scale — a flag is not type. */
+.ab-flag { font-size: var(--g-feature); margin-right: var(--s-md); }
+
+/* ------------------------------------------------------------------ tabs */
+
+/* Below the breakpoint the shell adopts the phone's own furniture: three
+   icons, in the same order, where a thumb is. Someone arriving from the
+   Seeker app should not have to find the navigation twice. */
+.ab-tabs { display: none; }
+
+@media (max-width: 860px) {
+  .app-root { --tabs-h: 58px; }
+
+  .ab-bar { gap: var(--s-md); }
+  .ab-bar .ab-nav { display: none; }
+  .ab-bar .ab-net { display: none; }
+
+  .ab-board { grid-template-columns: minmax(0, 1fr); }
+  .ab-board-side {
+    border-left: 0;
+    border-top: var(--hairline) solid var(--c-border);
+    box-shadow: var(--e-sheet);
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+  }
+
+  .ab-tabs {
+    position: sticky;
+    bottom: 0;
+    z-index: 40;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    height: calc(var(--tabs-h) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--c-surface);
+    border-top: var(--hairline) solid var(--c-border);
+  }
+  .ab-tabs a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-xs);
+    min-height: var(--t-min);
+    /* Matching HomeNavigator's `tabLabel` exactly: xs, semibold, body face.
+       Not the mono micro-label — a tab is a destination, not a data readout. */
+    font-size: var(--fs-xs);
+    font-weight: var(--fw-semibold);
+    color: var(--c-text-muted);
+  }
+  .ab-tabs a[aria-current="page"] { color: var(--c-text); }
+  .ab-tabs svg { width: var(--i-lg); height: var(--i-lg); }
+}
+
+@media (max-width: 420px) {
+  .ab-lockup span { display: none; }
+}

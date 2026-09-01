@@ -224,8 +224,11 @@ h3 {
   .nav-links { display: none; }
   .nav-end { margin-left: auto; }
 }
+/* The header CTA is a destination now, not a follow link, so it survives to
+   the narrowest viewport. The wordmark gives up the room instead — the mark
+   alone still reads as the lockup, and it is a link home either way. */
 @media (max-width: 430px) {
-  .nav-cta { display: none; }
+  .lockup span { display: none; }
 }
 
 /* --------------------------------------------------------- theme toggle */
