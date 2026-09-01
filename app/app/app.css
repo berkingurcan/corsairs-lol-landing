@@ -408,3 +408,19 @@ body:has(.app-root) .skip {
 
 /* The full address, which is 44 characters and must not widen the panel. */
 .ab-wallet-full { overflow-wrap: anywhere; line-height: 1.35; }
+
+/* ---------------------------------------------------- the mock board badge */
+
+/* A board of invented prices has to say so, and say it in the colour the rest
+   of the interface reserves for "look at this". It is the same badge slot the
+   network occupies against the real API — one fact, one place. */
+.ab-net.is-mock {
+  border-color: var(--c-warning);
+  color: var(--c-warning);
+  cursor: pointer;
+  font-family: var(--f-mono);
+}
+.ab-net.is-mock::before { background: var(--c-warning); }
+
+.ab-dev-list { display: flex; flex-direction: column; gap: var(--s-xxs); }
+.ab-dev-list .ab-chip { justify-content: flex-start; text-align: left; }

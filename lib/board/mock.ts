@@ -369,6 +369,11 @@ export const mockAdapter: BoardAdapter = {
     // empty body is the point — see the note on the interface.
   },
 
+  assertBannerIsFree() {
+    // As above: no bytes to check. The real one decodes the memo and asserts
+    // it carries no transfer instruction and no account it does not need.
+  },
+
   async settle({ intentId }) {
     await jitter(700, 500);
 

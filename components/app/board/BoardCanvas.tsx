@@ -12,6 +12,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useBoard } from "@/lib/board/BoardProvider";
+import { usePurchase } from "@/lib/board/usePurchase";
 import { getCountryByIso2 } from "@/lib/countries";
 import { useWallet } from "@/lib/wallet/WalletProvider";
 
@@ -34,9 +35,13 @@ const LENSES: { value: BoardFilter; label: string }[] = [
   { value: "mine", label: "Mine" },
 ];
 
+/** Statuses where the selection is not the player's to change. */
+const BUSY: string[] = ["quoting", "confirming-price", "awaiting-signature", "settling"];
+
 export function BoardCanvas() {
   const { territories, loading } = useBoard();
   const { publicKey } = useWallet();
+  const purchase = usePurchase();
 
   const [selected, setSelected] = useState<string | null>(null);
   const [filter, setFilter] = useState<BoardFilter>("all");
@@ -80,11 +85,34 @@ export function BoardCanvas() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const pick = useCallback((iso2: string) => {
-    setSelected(iso2);
-    setSearchOpen(false);
-    mapRef.current?.flyTo(iso2);
-  }, []);
+  /**
+   * A purchase in flight pins the board.
+   *
+   * Once the server has reserved a country — and certainly once the wallet is
+   * open — clicking somewhere else cannot be allowed to swap the panel out
+   * from under it. You do not get to shop while your wallet is open, and a
+   * settling purchase that scrolled off screen is how someone concludes their
+   * money vanished.
+   */
+  const busy = BUSY.includes(purchase.status);
+
+  const select = useCallback(
+    (iso2: string | null) => {
+      if (busy) return;
+      setSelected(iso2);
+    },
+    [busy],
+  );
+
+  const pick = useCallback(
+    (iso2: string) => {
+      if (busy) return;
+      setSelected(iso2);
+      setSearchOpen(false);
+      mapRef.current?.flyTo(iso2);
+    },
+    [busy],
+  );
 
   const held = useMemo(
     () => [...territories.values()].filter((t) => t.isClaimed).length,
@@ -99,7 +127,7 @@ export function BoardCanvas() {
           selected={selected}
           mine={publicKey}
           filter={filter}
-          onSelect={setSelected}
+          onSelect={select}
           handleRef={mapRef}
           onReady={onMapReady}
         />
@@ -139,11 +167,17 @@ export function BoardCanvas() {
         </button>
       </div>
 
-      <aside className="ab-board-side" aria-label="Country inspector">
+      {/* On a wide screen this is a column; below 860px `is-open` lifts it into
+          a sheet along the bottom edge, which is the phone's own furniture. */}
+      <aside
+        className={"ab-board-side" + (selected ? " is-open" : "")}
+        aria-label="Country inspector"
+      >
         <CountryPanel
           iso2={selected}
           territory={selected ? territories.get(selected) : undefined}
           mine={publicKey}
+          purchase={purchase}
         />
       </aside>
 

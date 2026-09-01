@@ -142,6 +142,21 @@ export const httpAdapter: BoardAdapter = {
     );
   },
 
+  assertBannerIsFree() {
+    /**
+     * NOT IMPLEMENTED — fails closed, exactly like `assertIntentIsSafe`.
+     *
+     * The implementation is `assertBannerTransactionIsFree` in the app repo:
+     * decode the memo and assert it carries no transfer instruction. The
+     * editor tells the owner this costs only the network fee; signing without
+     * checking would make that a promise the client cannot keep.
+     */
+    throw new BoardError(
+      "This build can't verify what it is signing, so it won't sign it.",
+      "not_implemented",
+    );
+  },
+
   settle(params) {
     return request<SettleResponse>("/settle", { method: "POST", body: params });
   },

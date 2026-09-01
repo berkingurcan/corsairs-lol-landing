@@ -84,6 +84,15 @@ export function formatPrice(amount: number, decimals = 4): string {
   return `${formatAmount(amount, decimals)} ${CURRENCY}`;
 }
 
+/**
+ * The amount as the bid FIELD shows it — plain digits, no currency, no
+ * thousands separators. Grouping is for reading; this text has to be editable,
+ * and a comma in a numeric field is a keystroke someone has to delete.
+ */
+export function formatAmountForInput(amount: number): string {
+  return String(Number(amount.toFixed(SOL_DECIMALS)));
+}
+
 /** Wallet addresses and signatures, at the length a row can carry. */
 export function shortenAddress(address: string, lead = 4, tail = 4): string {
   if (address.length <= lead + tail + 1) return address;

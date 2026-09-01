@@ -14,15 +14,15 @@
  * where the phone's reach rule puts it: readouts top, actions in the bottom
  * third.
  */
+import { useEffect, useState } from "react";
+
 import { getCountryByIso2 } from "@/lib/countries";
-import {
-  calculateProfitSplit,
-  formatAmount,
-  formatPrice,
-  getPriceToTake,
-  shortenAddress,
-} from "@/lib/board/config";
+import { formatAmount, getPriceToTake, shortenAddress } from "@/lib/board/config";
 import type { Territory } from "@/lib/board/types";
+import type { usePurchase } from "@/lib/board/usePurchase";
+
+import { BannerEditor } from "./BannerEditor";
+import { PurchasePanel } from "./PurchasePanel";
 
 const dateFormat = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
@@ -34,11 +34,18 @@ export function CountryPanel({
   iso2,
   territory,
   mine,
+  purchase,
 }: {
   iso2: string | null;
   territory: Territory | undefined;
   mine: string | null;
+  purchase: ReturnType<typeof usePurchase>;
 }) {
+  // Whether the owner is writing their banner. Local, because it is a mode of
+  // this panel and not of the board — selecting another country leaves it.
+  const [editing, setEditing] = useState(false);
+  useEffect(() => setEditing(false), [iso2]);
+
   if (!iso2) {
     return (
       <div className="ab-panel-empty">
@@ -57,15 +64,22 @@ export function CountryPanel({
 
   const country = getCountryByIso2(iso2);
   const claimed = Boolean(territory?.isClaimed);
+  const owned = Boolean(mine && territory?.ownerAddress === mine);
+
+  // The editor takes the whole panel rather than sitting under the readouts:
+  // it is a form with a preview, and the preview is the part worth the room.
+  if (editing && territory && owned) {
+    return <BannerEditor territory={territory} onDone={() => setEditing(false)} />;
+  }
+
   const isMine = Boolean(mine && territory?.ownerAddress === mine);
   const price = territory ? getPriceToTake(territory) : null;
-  // What the captain being displaced walks away with at the current floor.
-  // Shown next to the price because it is the other half of the same
-  // transaction, and because it is the answer to "where does my money go".
-  const split =
-    territory && claimed && price !== null
-      ? calculateProfitSplit(territory.currentPrice, price)
-      : null;
+  // What the displaced captain walks away with is NOT shown here. It used to
+  // be, and it printed the same figure the purchase block prints one section
+  // below under "To the captain" — with one difference that made the
+  // duplication worse than redundant: this copy was computed from the asking
+  // price and that one from what is actually being bid, so raising made the
+  // panel show two different answers to the same question.
 
   return (
     <div className="ab-inspector">
@@ -126,22 +140,17 @@ export function CountryPanel({
           <dt className="ab-label">Times taken</dt>
           <dd className="ab-value">{territory?.flipCount ?? 0}</dd>
         </div>
-        <div>
-          <dt className="ab-label">They receive</dt>
-          <dd className="ab-value">
-            {split ? formatPrice(split.previousOwnerPayout) : "—"}
-          </dd>
-        </div>
       </dl>
 
-      <div className="ab-stub ab-stub-inline">
-        <span className="ab-stub-step">Step 4 · the purchase</span>
-        <p>
-          The bid field, the quick raises, and the six states a purchase moves through
-          land here — at the end of the pointer&rsquo;s path, which is where the
-          phone&rsquo;s bottom third translates to on a wide screen.
-        </p>
-      </div>
+      {/* Actions at the end of the pointer's path — the phone's "readouts top,
+          actions in the bottom third", translated to a wide screen. */}
+      {territory && (
+        <PurchasePanel
+          territory={territory}
+          purchase={purchase}
+          onEditBanner={() => setEditing(true)}
+        />
+      )}
     </div>
   );
 }

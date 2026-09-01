@@ -4,6 +4,7 @@ import { BoardProvider } from "@/lib/board/BoardProvider";
 import { Mark } from "@/components/Mark";
 import { WalletProvider } from "@/lib/wallet/WalletProvider";
 import { AppNav } from "./AppNav";
+import { NetworkBadge } from "./NetworkBadge";
 import { WalletPill } from "./WalletPill";
 
 /**
@@ -33,9 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <AppNav place="bar" />
 
             <div className="ab-bar-end">
-              {/* Every price on the board is real SOL, so the network is
-                  stated rather than assumed. */}
-              <span className="ab-net">Mainnet</span>
+              <NetworkBadge />
               <WalletPill />
             </div>
           </header>

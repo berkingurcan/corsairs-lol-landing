@@ -211,6 +211,18 @@ export interface BoardAdapter {
    */
   settle(params: { intentId: string; signature: string }): Promise<SettleResponse>;
 
+  /**
+   * Asserts the banner transaction moves no money.
+   *
+   * A banner is a memo: it costs the network fee and nothing else, which is
+   * the promise the editor prints under its save button. A response that
+   * quietly attached a transfer would be signed under that promise, so the
+   * bytes are checked before the wallet sees them for the same reason a
+   * purchase's are — and, like that one, the call site is permanent while only
+   * the implementation is empty.
+   */
+  assertBannerIsFree(draft: BannerDraft, ownerAddress: string): void;
+
   prepareBanner(params: {
     countryCode: string;
     ownerAddress: string;
