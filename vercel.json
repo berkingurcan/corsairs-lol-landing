@@ -1,6 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
+
+  "//redirects": [
+    "The other half of the /t -> /app/c handoff. Uncomment as `redirects` and",
+    "flip `boardIsLive` in lib/site.ts at the same time; doing one without the",
+    "other either indexes two pages per country or strands the share links the",
+    "Seeker app has already published.",
+    { "source": "/t/:code", "destination": "/app/c/:code", "permanent": true }
+  ],
+
   "headers": [
     {
       "source": "/assets/(.*)",

@@ -79,13 +79,16 @@ export default async function TerritoryPage({ params }: Props) {
               banner on it until another captain pays more.
             </p>
 
+            {/* The board exists now, so this page has somewhere to send
+                people. It stays a link rather than a redirect while the board
+                is mock-fed — see `boardIsLive`. */}
             <div className="cta">
-              <Link className="btn btn-solid" href="/#how">
+              <Link className="btn btn-solid" href={`/app?c=${country.iso2}`}>
+                Open {country.name} on the board
+              </Link>
+              <Link className="btn btn-ghost" href="/#how">
                 How the game works
               </Link>
-              <a className="btn btn-ghost" href={site.x} rel="noopener">
-                Follow {site.xHandle}
-              </a>
             </div>
 
             <dl className="specs territory-facts">
@@ -111,8 +114,8 @@ export default async function TerritoryPage({ params }: Props) {
 
             <p className="fineprint">
               <span className="dot" aria-hidden="true" />
-              The live price and the current captain are in the app. This page is a static
-              file and the board moves, so it does not pretend to know them.
+              This page is a static file and the board moves, so it does not pretend to
+              know the price or the captain. The board does.
             </p>
           </div>
         </section>

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { ActivityBoard } from "@/components/app/ActivityBoard";
+
 export const metadata: Metadata = { title: "Activity" };
 
 /**
@@ -24,14 +26,7 @@ export default function ActivityPage() {
         </p>
       </header>
 
-      <div className="ab-stub">
-        <span className="ab-stub-step">Step 6 · activity</span>
-        <p>
-          Rows land here once the board has data: country, holder, banner, current price
-          and the flip that set it. Desktop gains a second column the phone has no room
-          for — the leaderboard, which is a separate segment there.
-        </p>
-      </div>
+      <ActivityBoard />
     </div>
   );
 }

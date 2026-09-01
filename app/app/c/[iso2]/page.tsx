@@ -12,11 +12,11 @@
  * and once it does, /t/<ISO2> starts redirecting here.
  */
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { CountryLive } from "@/components/app/board/CountryLive";
 import { COUNTRIES, getCountryByIso2 } from "@/lib/countries";
-import { game, site } from "@/lib/site";
+import { boardIsLive, game, site } from "@/lib/site";
 
 export const dynamicParams = false;
 
@@ -37,12 +37,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: country.name,
     description,
-    // Not indexed yet, and deliberately so: /t/<ISO2> is already in the
-    // sitemap saying the same thing about the same country, and two indexed
-    // pages per country is a duplicate before it is a placeholder. This flips
-    // to `index: true` in step 6, in the same change that points /t/<ISO2>
-    // here and swaps the sitemap over — one page per country, the live one.
-    robots: { index: false, follow: true },
+    // One indexed page per country. While the board is mock-fed that is
+    // /t/<ISO2>, which is honest about knowing no price; once it is live it is
+    // this one, which shows a real one. See `boardIsLive`.
+    robots: { index: boardIsLive, follow: true },
     alternates: { canonical: `/app/c/${country.iso2}` },
     openGraph: {
       type: "website",
@@ -89,19 +87,7 @@ export default async function CountryPage({ params }: Props) {
         </p>
       </header>
 
-      <div className="ab-stub">
-        <span className="ab-stub-step">Step 6 · country page</span>
-        <p>
-          Current holder, their banner, the price to take, and the full chain of hands
-          this country has passed through — read live from the board rather than baked
-          into the file, which is what separates this page from /t/{country.iso2}.
-        </p>
-        {/* The board honours ?c= on arrival and flies to the country, so this
-            link is already the destination it will be. */}
-        <Link className="ab-btn ab-btn-primary" href={`/app?c=${country.iso2}`}>
-          Open the board on {country.name}
-        </Link>
-      </div>
+      <CountryLive iso2={country.iso2} name={country.name} />
     </div>
   );
 }

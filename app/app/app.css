@@ -424,3 +424,129 @@ body:has(.app-root) .skip {
 
 .ab-dev-list { display: flex; flex-direction: column; gap: var(--s-xxs); }
 .ab-dev-list .ab-chip { justify-content: flex-start; text-align: left; }
+
+/* ================================================== the read-only surfaces */
+
+/* Activity, holdings and the country pages are all the same object repeated:
+   a row with an identity on the left and a figure on the right. One set of
+   classes for all three, because three screens with three row treatments is
+   three chances for them to drift. */
+
+.ab-grid-lg { display: flex; flex-direction: column; gap: var(--s-huge); }
+
+.ab-section-head {
+  margin-bottom: var(--s-lg) !important;
+  font-size: var(--fs-xl) !important;
+}
+
+/* Rows on the left, context on the right. Below 900px the context follows the
+   rows rather than squeezing beside them — a leaderboard in a 200px column is
+   a leaderboard nobody reads. */
+.ab-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: var(--s-huge);
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .ab-split { grid-template-columns: minmax(0, 1fr); gap: var(--s-xxxl); }
+}
+
+.ab-rows { margin: 0; padding: 0; list-style: none; }
+
+.ab-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-md);
+  padding: var(--s-md) var(--s-sm);
+  border-bottom: var(--hairline) solid var(--c-border);
+  border-radius: var(--r-sm);
+  transition: background-color .14s ease;
+}
+.ab-row:hover { background: var(--c-surface-alt); }
+.ab-rows li:last-child .ab-row { border-bottom: 0; }
+
+/* Tabular so the ordering reads as an ordering rather than as decoration. */
+.ab-row-rank {
+  flex: none;
+  min-width: 22px;
+  font-family: var(--f-mono);
+  font-size: var(--fs-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-text-disabled);
+}
+
+.ab-row-flag { flex: none; font-size: var(--g-row); line-height: 1; }
+
+.ab-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+
+.ab-row-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-sm);
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--c-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ab-row-meta {
+  display: flex;
+  align-items: center;
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ab-row-meta .ab-owner-dot { margin-right: var(--s-sm); }
+.ab-row-when { margin-left: var(--s-xs); color: var(--c-text-disabled); }
+
+/* Semantic colour marks a value, never a fill. "Yours" is worth one. */
+.ab-row-mine {
+  flex: none;
+  padding: 1px var(--s-sm);
+  border: var(--hairline) solid var(--c-success);
+  border-radius: var(--r-pill);
+  font-family: var(--f-mono);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-regular);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--c-success);
+}
+
+.ab-row-figures {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+.ab-row-sub {
+  font-size: var(--fs-xs);
+  color: var(--c-text-disabled);
+  white-space: nowrap;
+}
+.ab-value.is-good { color: var(--c-success); }
+
+.ab-aside { position: sticky; top: calc(var(--bar-h) + var(--s-lg)); }
+.ab-aside h2 { margin-bottom: var(--s-md) !important; font-size: var(--fs-lg) !important; }
+.ab-aside .ab-caption { margin-top: var(--s-lg); }
+
+.ab-leaders { margin: 0; padding: 0; list-style: none; }
+.ab-leaders li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-md);
+  padding: var(--s-sm) 0;
+  border-bottom: var(--hairline) solid var(--c-border);
+}
+.ab-leaders li:last-child { border-bottom: 0; }
+.ab-leaders .ab-mono { flex: 1; min-width: 0; }
+
+@media (max-width: 560px) {
+  .ab-row-rank { display: none; }
+}

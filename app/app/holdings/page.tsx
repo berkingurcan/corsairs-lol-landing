@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { HoldingsBoard } from "@/components/app/HoldingsBoard";
+
 export const metadata: Metadata = { title: "Holdings" };
 
 /**
@@ -21,15 +23,7 @@ export default function HoldingsPage() {
         </p>
       </header>
 
-      <div className="ab-stub">
-        <span className="ab-stub-step">Step 6 · holdings</span>
-        <p>
-          Balance is the figure and the address is the caption under it — nobody opens
-          this to read their own public key. Below it: countries held, realised profit,
-          and the outbid alerts, each carrying the banner you had up so taking the
-          country back restores it in one action.
-        </p>
-      </div>
+      <HoldingsBoard />
     </div>
   );
 }

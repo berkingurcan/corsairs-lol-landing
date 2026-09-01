@@ -31,6 +31,23 @@ export const site = {
   appScheme: "corsairslol",
 } as const;
 
+/**
+ * Whether /app is reading the real settlement API.
+ *
+ * The web board's country pages (/app/c/<ISO2>) say the same thing about the
+ * same country as the share landings (/t/<ISO2>), so exactly one of the two
+ * gets indexed and gets the sitemap. While the board is mock-fed that has to
+ * be /t: those links are already in the wild — `share.ts` in the Seeker app
+ * builds them — and pointing a real player's share at a page of invented
+ * prices is worse than pointing it at a page that admits it knows no price.
+ *
+ * Flipping this to `true` moves indexing and the sitemap to /app/c. The other
+ * half of the flip is the redirect block in vercel.json, which is commented
+ * out beside a pointer to this constant. Two edits, and they are the whole
+ * handoff.
+ */
+export const boardIsLive = false;
+
 /** Mirrors src/constants/gameConfig.ts on the app's master branch. */
 export const game = {
   /** BASE_TERRITORY_PRICE.SOL — opening price of an unclaimed country. */
