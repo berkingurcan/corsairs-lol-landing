@@ -414,6 +414,13 @@
   font-size: var(--fs-xs);
   color: var(--m-banner-link);
 }
+/* The panel shows a banner whole — this is the surface the map's 190px label
+   truncates ON BEHALF of. A link may be 150 characters with no space in it,
+   which overflows a fixed-width aside rather than wrapping, so it is told to
+   break anywhere; the prose fields only need long words handled. */
+.ab-banner-title,
+.ab-banner-tagline { overflow-wrap: break-word; }
+.ab-banner-link { overflow-wrap: anywhere; }
 
 .ab-facts { margin: 0; display: flex; flex-direction: column; gap: var(--s-md); }
 .ab-facts > div {

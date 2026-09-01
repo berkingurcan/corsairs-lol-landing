@@ -21,8 +21,8 @@ import {
   getExplorerUrl,
   getPriceToTake,
   shortenAddress,
+  timeAgo,
 } from "@/lib/board/config";
-import { timeAgo } from "@/lib/board/derive";
 import { useWallet } from "@/lib/wallet/WalletProvider";
 
 const dateFormat = new Intl.DateTimeFormat("en-GB", {

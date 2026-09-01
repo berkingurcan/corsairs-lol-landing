@@ -4,9 +4,9 @@
  * The board, held once for the whole app.
  *
  * Every screen reads from here and none of them knows whether the rows are
- * real. The adapter is chosen on the marked line below and nowhere else — that
- * is the entire cost of going live, and it is only that cheap because the seam
- * was built before anything was written against it.
+ * real. The adapter is chosen in `current.ts` and nowhere else — that is the
+ * entire cost of going live, and it is only that cheap because the seam was
+ * built before anything was written against it.
  */
 import {
   createContext,
@@ -20,16 +20,8 @@ import {
 
 import { POLL_INTERVAL_HIDDEN_MS, POLL_INTERVAL_MS } from "./config";
 import { BoardError, type BoardAdapter } from "./adapter";
-import { mockAdapter } from "./mock";
+import { adapter } from "./current";
 import type { FlipRecord, Territory } from "./types";
-
-// ─────────────────────────────────────────────────────────────
-// The one line that changes when the backend lands:
-//   import { httpAdapter } from "./http";
-//   const adapter: BoardAdapter = httpAdapter;
-// Read the note on `assertIntentIsSafe` in http.ts before you do.
-const adapter: BoardAdapter = mockAdapter;
-// ─────────────────────────────────────────────────────────────
 
 export interface BoardContextValue {
   adapter: BoardAdapter;

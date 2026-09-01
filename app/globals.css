@@ -423,6 +423,10 @@ h3 {
   margin-left: auto; font-family: var(--mono); font-size: 0.62rem;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-3);
   border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px;
+  /* A pill that wraps to two lines stops reading as a pill. "United States of
+     America" is a real country name and it is the one that pushes this rail
+     over, so the long name takes the wrap and the short chip keeps its shape. */
+  flex: none; white-space: nowrap;
 }
 .bc-body { padding: 22px 20px 20px; }
 .bc-title {
@@ -432,6 +436,14 @@ h3 {
 }
 .bc-tagline { margin: 0 0 14px; font-size: 0.93rem; line-height: 1.55; color: var(--fg-2); }
 .bc-link { margin: 0; font-family: var(--mono); font-size: 0.8rem; color: var(--link); }
+/* A banner is an advertisement its captain is paying to keep up, so all three
+   fields wrap and none of them clips. `.banner-card` sets `overflow: hidden`
+   for its rounded corners, which means anything that does not wrap is not
+   truncated with an ellipsis — it is silently cut off the edge, and the
+   captain has no way to know. A 150-character link has no spaces to break at,
+   so it needs `anywhere`; the prose above it only needs long words handled. */
+.bc-title, .bc-tagline { overflow-wrap: break-word; }
+.bc-link { overflow-wrap: anywhere; }
 .bc-foot {
   display: flex; justify-content: space-between; gap: 18px;
   padding: 15px 20px; border-top: 1px solid var(--line-soft);

@@ -204,23 +204,3 @@ export function activityRows(
 export function flipSplit(flip: FlipRecord) {
   return calculateProfitSplit(flip.previousPrice, flip.newPrice);
 }
-
-/**
- * How long ago, in the coarsest unit that is still true.
- *
- * "3 days ago" and not "3 days, 4 hours ago": nobody reading a feed is doing
- * arithmetic with it, and the extra precision only makes two rows from the
- * same afternoon look further apart than they are.
- */
-export function timeAgo(timestamp: number, now = Date.now()): string {
-  const seconds = Math.max(0, Math.round((now - timestamp) / 1000));
-  if (seconds < 60) return "just now";
-  const minutes = Math.round(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.round(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.round(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  const months = Math.round(days / 30);
-  return `${months}mo ago`;
-}

@@ -16,8 +16,8 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import { useBoard } from "@/lib/board/BoardProvider";
-import { formatAmount, formatPrice, shortenAddress } from "@/lib/board/config";
-import { activityRows, leaderboard, timeAgo } from "@/lib/board/derive";
+import { formatAmount, formatPrice, shortenAddress, timeAgo } from "@/lib/board/config";
+import { activityRows, leaderboard } from "@/lib/board/derive";
 import { getCountryByIso2 } from "@/lib/countries";
 import { useWallet } from "@/lib/wallet/WalletProvider";
 

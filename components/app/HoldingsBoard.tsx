@@ -16,8 +16,14 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import { useBoard } from "@/lib/board/BoardProvider";
-import { formatAmount, formatPrice, getExplorerUrl, shortenAddress } from "@/lib/board/config";
-import { boardStats, holdingsFor, timeAgo } from "@/lib/board/derive";
+import {
+  formatAmount,
+  formatPrice,
+  getExplorerUrl,
+  shortenAddress,
+  timeAgo,
+} from "@/lib/board/config";
+import { boardStats, holdingsFor } from "@/lib/board/derive";
 import { getPriceToTake } from "@/lib/board/config";
 import { getCountryByIso2 } from "@/lib/countries";
 import { colorForAddress } from "@/lib/board/ownerColor";

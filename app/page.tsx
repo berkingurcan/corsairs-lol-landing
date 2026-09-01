@@ -1,9 +1,21 @@
 import Link from "next/link";
 
+import { BannerCard, EXAMPLE_BANNER } from "@/components/BannerCard";
+import { BannerCardLive } from "@/components/BannerCardLive";
+import { RULE_STATS, StatList } from "@/components/HeroStats";
+import { HeroStatsLive } from "@/components/HeroStatsLive";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
-import { fmt, game, priceLadder, site } from "@/lib/site";
+import { boardIsLive, fmt, game, priceLadder, site } from "@/lib/site";
 
+/* The two live islands are imported plainly, and that is measured rather than
+   assumed. `boardIsLive` is a build-time `false`, so neither renders — but a
+   `"use client"` module imported by a server component joins the bundle
+   regardless, which costs this page 6.3KB it does not currently use. Wrapping
+   both in `next/dynamic` to reclaim that made the landing bundle LARGER
+   (584,591B against 581,957B): the loader lands eagerly and outweighs the two
+   islands it defers. So the static import stays, and the 6.3KB is the price of
+   having the live path already wired. */
 const ladder = priceLadder(3);
 
 export default function Home() {
@@ -48,20 +60,16 @@ export default function Home() {
             </p>
           </div>
 
-          <ul className="shell hero-stats" aria-label="At a glance">
-            <li>
-              <span className="stat-n">{game.countries}</span>
-              <span className="stat-l">countries</span>
-            </li>
-            <li>
-              <span className="stat-n price">{game.basePrice}</span>
-              <span className="stat-l">SOL to open one</span>
-            </li>
-            <li>
-              <span className="stat-n">+20%</span>
-              <span className="stat-l">to take one</span>
-            </li>
-          </ul>
+          {/* The board, or the rules of it.
+
+              Both branches render the same three-slot row, so the hero does
+              not change shape when this flips — and the flip is `boardIsLive`
+              and nothing else, because prices from the mock adapter printed on
+              a marketing page are invented numbers with no badge next to them
+              admitting it. The app can say MOCK BOARD in its own chrome. This
+              page cannot, so while the board is mock-fed it prints the rules,
+              which are true either way. */}
+          {boardIsLive ? <HeroStatsLive /> : <StatList stats={RULE_STATS} />}
         </section>
 
         {/* ── How it works ───────────────────────────────────────── */}
@@ -141,37 +149,12 @@ export default function Home() {
               </ul>
             </div>
 
-            <figure className="banner-card">
-              <div className="bc-top">
-                <span className="bc-flag" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M6.6 3.4v17.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    <path d="M7.9 4.9 20.4 8.1 16.9 10.2 20.4 12.3 7.9 15.5Z" fill="currentColor" />
-                  </svg>
-                </span>
-                <span className="bc-country">Portugal</span>
-                <span className="bc-tag">Held</span>
-              </div>
-              <div className="bc-body">
-                <p className="bc-title">Lisbon Outpost</p>
-                <p className="bc-tagline">
-                  Coffee, code and a very small navy. Take it if you think you can hold
-                  it.
-                </p>
-                <p className="bc-link">lisbon.example</p>
-              </div>
-              <div className="bc-foot">
-                <div>
-                  <span className="bc-lab">Captain</span>
-                  <span className="bc-val">7xKq…4mNb</span>
-                </div>
-                <div>
-                  <span className="bc-lab">Price to take</span>
-                  <span className="bc-val price">0.0600 SOL</span>
-                </div>
-              </div>
-              <figcaption>An example banner. Not a live territory.</figcaption>
-            </figure>
+            {/* Same gate as the hero, same reason. The example card is the
+                one this section has always carried; when the board is live it
+                is replaced by whoever is actually paying the most to stand on
+                it — which is the section's own argument, made with somebody
+                else's money instead of ours. */}
+            {boardIsLive ? <BannerCardLive /> : <BannerCard {...EXAMPLE_BANNER} />}
           </div>
         </section>
 
