@@ -46,41 +46,22 @@
   pointer-events: none;
 }
 
+/* ── Fills ──
+   These carry the pointer and nothing else. The owner colour arrives as an
+   inline style, which outranks this rule; what is declared here is the default
+   for land nobody has bought. */
 .ab-map-country {
   fill: var(--m-unclaimed);
-  stroke: var(--m-divider);
-  stroke-width: 0.6;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
+  stroke: none;
   cursor: pointer;
-  transition: stroke .12s ease, opacity .18s ease;
+  transition: opacity .18s ease;
 }
 
-/* Claimed land is the lit thing now, so its boundary stops being the light
-   and becomes the seam that keeps two owners apart. */
-.ab-map-country.is-claimed {
-  stroke: var(--m-rival-stroke);
-  stroke-width: 0.75;
-}
-
-.ab-map-country.is-mine {
-  stroke: var(--m-mine-stroke);
-  stroke-width: 1.25;
-  /* Dashed, and that is the whole point.
-     Selection and ownership were both "outlined in silver", which made the
-     country you had picked indistinguishable from the nine you already own —
-     Graphite has the same collision on white and resolves it only with the
-     halo. Differing in KIND rather than in weight settles it: a dash reads as
-     a standing claim, a solid ring reads as a cursor, and solid wins at a
-     glance. `non-scaling-stroke` keeps the dash the same length at 1x and at
-     64x, so it never degenerates into a dotted line. */
-  stroke-dasharray: 3 2.5;
-}
-
-.ab-map-country:hover {
-  stroke: var(--m-selection);
-  stroke-width: 1.25;
-  stroke-dasharray: none;
+.ab-map-beacon {
+  fill: var(--m-unclaimed);
+  stroke: none;
+  cursor: pointer;
+  transition: opacity .18s ease;
 }
 
 /* What the active lens excludes. Dimmed rather than hidden: a country you
@@ -91,40 +72,55 @@
   opacity: var(--m-dimmed-opacity);
 }
 
-/* The 28 micro-states have no polygon at 1:110m — see lib/map/markers.ts.
-   A beacon rather than an invented outline: a shape that is not the country's
-   shape is worse than an honest dot. */
-.ab-map-beacon {
-  fill: var(--m-unclaimed);
-  stroke: var(--m-divider);
-  stroke-width: 0.9;
-  vector-effect: non-scaling-stroke;
-  cursor: pointer;
-  transition: stroke .12s ease, opacity .18s ease;
-}
-.ab-map-beacon.is-claimed { stroke: var(--m-rival-stroke); }
-.ab-map-beacon.is-mine { stroke: var(--m-mine-stroke); stroke-dasharray: 3 2.5; }
-.ab-map-beacon:hover { stroke: var(--m-selection); stroke-width: 1.4; stroke-dasharray: none; }
+/* ── Boundaries ──
+   Their own layer, above every fill, so nothing can overpaint a line. One lit
+   hairline for every country, at every zoom: a coastline is a line on a chart,
+   not a wall with a thickness. */
+.ab-map-borders { pointer-events: none; }
 
-/* The selection, drawn last and on top — twice.
-   The casing is Graphite's `selectionHalo`, inverted. Its stated reason (a
-   black ring must survive a bright fill) does not carry over, but its unstated
-   one does: without a casing, "selected" and "yours" are both a silver outline
-   and neither wins. The dark cut around the ring is what separates them. */
+.ab-map-border,
+.ab-map-mine,
+.ab-map-hover,
+.ab-map-ring,
 .ab-map-ring-casing {
   fill: none;
-  stroke: var(--m-selection-halo);
-  stroke-width: 5;
   stroke-linejoin: round;
   vector-effect: non-scaling-stroke;
+}
+
+.ab-map-border {
+  stroke: var(--m-divider);
+  stroke-width: 0.75;
+}
+
+/* Yours. Dashed, and that is the whole point: selection and ownership were
+   both "outlined in silver", which made the country you had picked
+   indistinguishable from the nine you already own — Graphite has the same
+   collision on white and resolves it only with the halo. Differing in KIND
+   rather than in weight settles it. `non-scaling-stroke` keeps the dash the
+   same length at 1x and at 64x, so it never degenerates into dots. */
+.ab-map-mine {
+  stroke: var(--m-mine-stroke);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 2.5;
+}
+
+.ab-map-marks { pointer-events: none; }
+
+.ab-map-hover {
+  stroke: var(--m-selection);
+  stroke-width: 1.4;
+}
+
+/* The casing is Graphite's `selectionHalo`, inverted — see the token. */
+.ab-map-ring-casing {
+  stroke: var(--m-selection-halo);
+  stroke-width: 5;
 }
 
 .ab-map-ring {
-  fill: none;
   stroke: var(--m-selection);
   stroke-width: 2.25;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
 }
 
 /* --------------------------------------------------------------------- hud */

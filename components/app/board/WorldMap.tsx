@@ -109,23 +109,26 @@ interface Paint {
 }
 
 /**
- * Split out and memoised so hovering does not re-render 195 paths.
+ * Fills.
  *
- * The hover HIGHLIGHT is pure CSS — `:hover` on the path — so React only ever
- * hears about hover for the readout chip, which is one small element. This
- * layer re-renders when the board polls or the selection moves, and at no
- * other time.
+ * Drawn first, and they carry the pointer: a country is clicked on its body,
+ * not on its outline.
+ *
+ * The colour arrives as an inline STYLE and not as a `fill` attribute, which
+ * is not a stylistic preference — a presentation attribute is the lowest
+ * priority author style there is, so `.ab-map-country { fill: … }` in the
+ * stylesheet silently beat every owner colour and the whole board rendered
+ * unclaimed. An inline style outranks the rule; the rule stays as the default
+ * for the countries nobody has bought.
  */
-const MapLayer = memo(function MapLayer({
+const MapFills = memo(function MapFills({
   paints,
-  selected,
   markerScale,
   onSelect,
   setHovered,
   panning,
 }: {
   paints: Map<string, Paint>;
-  selected: string | null;
   markerScale: number;
   onSelect(iso2: string): void;
   setHovered: Dispatch<SetStateAction<string | null>>;
@@ -137,11 +140,8 @@ const MapLayer = memo(function MapLayer({
     onSelect(iso2);
   };
 
-  const selectedPath = selected ? COUNTRY_PATHS[selected] : undefined;
-  const selectedMarker = selected ? MARKER_BY_CODE.get(selected) : undefined;
-
   return (
-    <>
+    <g>
       {/* Antarctica and other non-sovereign terrain: visible, never selectable. */}
       <path d={NEUTRAL_LAND_PATH} className="ab-map-neutral" />
 
@@ -151,13 +151,8 @@ const MapLayer = memo(function MapLayer({
           <path
             key={iso2}
             d={COUNTRY_PATHS[iso2]}
-            fill={paint.fill}
-            className={
-              "ab-map-country" +
-              (paint.claimed ? " is-claimed" : "") +
-              (paint.mine ? " is-mine" : "") +
-              (paint.dimmed ? " is-dimmed" : "")
-            }
+            style={paint.fill ? { fill: paint.fill } : undefined}
+            className={"ab-map-country" + (paint.dimmed ? " is-dimmed" : "")}
             onPointerEnter={() => setHovered(iso2)}
             // Guarded rather than cleared outright: on some browsers the enter
             // for the next country lands before the leave for this one, and an
@@ -177,52 +172,112 @@ const MapLayer = memo(function MapLayer({
             cx={marker.x}
             cy={marker.y}
             r={MARKER_R * markerScale}
-            fill={paint.fill}
-            className={
-              "ab-map-beacon" +
-              (paint.claimed ? " is-claimed" : "") +
-              (paint.mine ? " is-mine" : "") +
-              (paint.dimmed ? " is-dimmed" : "")
-            }
+            style={paint.fill ? { fill: paint.fill } : undefined}
+            className={"ab-map-beacon" + (paint.dimmed ? " is-dimmed" : "")}
             onPointerEnter={() => setHovered(marker.iso2)}
             onPointerLeave={() => setHovered((h) => (h === marker.iso2 ? null : h))}
             onClick={() => select(marker.iso2)}
           />
         );
       })}
-
-      {/* The selection ring is drawn again, last, over a dark casing.
-          Last, because SVG has no z-index: painted in place, a ring on a small
-          country is overdrawn by whichever neighbour comes after it in the
-          list. Over a casing, because a bare silver ring is exactly what a
-          country the viewer OWNS already wears — see `--m-selection-halo`. */}
-      {selectedPath && (
-        <>
-          <path d={selectedPath} className="ab-map-ring-casing" pointerEvents="none" />
-          <path d={selectedPath} className="ab-map-ring" pointerEvents="none" />
-        </>
-      )}
-      {selectedMarker && (
-        <>
-          <circle
-            cx={selectedMarker.x}
-            cy={selectedMarker.y}
-            r={MARKER_R * markerScale * 1.7}
-            className="ab-map-ring-casing"
-            pointerEvents="none"
-          />
-          <circle
-            cx={selectedMarker.x}
-            cy={selectedMarker.y}
-            r={MARKER_R * markerScale * 1.7}
-            className="ab-map-ring"
-            pointerEvents="none"
-          />
-        </>
-      )}
-    </>
+    </g>
   );
 });
+
+/**
+ * Boundaries, as their own layer above every fill.
+ *
+ * This is the fix for borders that showed on one side of a country and not the
+ * other. Drawn per country alongside its fill, a boundary is painted and then
+ * overpainted by whichever neighbour happens to come later in the list — and
+ * the list is alphabetical by ISO code, so which of two countries won a shared
+ * border was arbitrary. Worse, the two carried different stroke colours, so a
+ * country's outline changed colour partway round depending on who its
+ * neighbours were.
+ *
+ * Fills first, then every boundary on top of all of them: nothing can cover a
+ * line any more, and a country's outline is one continuous colour.
+ *
+ * One colour, too. Graphite gives `divider` and `rivalStroke` the same value —
+ * both are the ocean, cutting between land masses on a light board. The
+ * faithful inversion is one lit hairline everywhere, and it lets the fill do
+ * the job the fill is for: claimed land is the land that is lit.
+ */
+const MapBorders = memo(function MapBorders({
+  paints,
+  markerScale,
+}: {
+  paints: Map<string, Paint>;
+  markerScale: number;
+}) {
+  return (
+    <g className="ab-map-borders">
+      {ISO_CODES.map((iso2) => (
+        <path key={iso2} d={COUNTRY_PATHS[iso2]} className="ab-map-border" />
+      ))}
+      {MARKER_POSITIONS.map((marker) => (
+        <circle
+          key={marker.iso2}
+          cx={marker.x}
+          cy={marker.y}
+          r={MARKER_R * markerScale}
+          className="ab-map-border"
+        />
+      ))}
+
+      {/* Yours, dashed — see `--m-selection-halo` for why kind and not weight. */}
+      {ISO_CODES.filter((iso2) => paints.get(iso2)!.mine).map((iso2) => (
+        <path key={iso2} d={COUNTRY_PATHS[iso2]} className="ab-map-mine" />
+      ))}
+      {MARKER_POSITIONS.filter((m) => paints.get(m.iso2)!.mine).map((marker) => (
+        <circle
+          key={marker.iso2}
+          cx={marker.x}
+          cy={marker.y}
+          r={MARKER_R * markerScale}
+          className="ab-map-mine"
+        />
+      ))}
+    </g>
+  );
+});
+
+/**
+ * Hover and selection, last of all.
+ *
+ * Not memoised, and deliberately outside both layers above: hover changes on
+ * every pointer move across the board, and re-rendering 334 paths for it would
+ * be the one piece of per-frame framework work this component exists to avoid.
+ * Here it costs at most three elements.
+ */
+function MapMarks({
+  hovered,
+  selected,
+  markerScale,
+}: {
+  hovered: string | null;
+  selected: string | null;
+  markerScale: number;
+}) {
+  const outline = (iso2: string, className: string) => {
+    const path = COUNTRY_PATHS[iso2];
+    if (path) return <path d={path} className={className} />;
+    const marker = MARKER_BY_CODE.get(iso2);
+    if (!marker) return null;
+    return <circle cx={marker.x} cy={marker.y} r={MARKER_R * markerScale * 1.7} className={className} />;
+  };
+
+  return (
+    <g className="ab-map-marks">
+      {hovered && hovered !== selected && outline(hovered, "ab-map-hover")}
+      {/* The ring sits over a dark casing: a bare silver outline is exactly
+          what a country you OWN already wears, and without the cut between
+          them neither signal wins. See `--m-selection-halo`. */}
+      {selected && outline(selected, "ab-map-ring-casing")}
+      {selected && outline(selected, "ab-map-ring")}
+    </g>
+  );
+}
 
 // ─────────────────────────────────────────────────────────────────── the map
 
@@ -473,9 +528,11 @@ export function WorldMap({
       const claimed = Boolean(territory?.isClaimed);
       const isMine = Boolean(mine && territory?.ownerAddress === mine);
       map.set(iso2, {
-        // Undefined leaves the fill to CSS, which is where the unclaimed
-        // value belongs — an owner colour is data, `--m-unclaimed` is design.
-        fill: claimed && territory?.color ? territory.color : undefined,
+        // Undefined leaves the fill to CSS, which is where the unclaimed value
+        // belongs — an owner colour is data, `--m-unclaimed` is design. A
+        // claimed country always gets a lit fill, even if the server sent no
+        // colour: land that is spoken for must never read as open.
+        fill: claimed ? territory?.color || "var(--m-claimed-fallback)" : undefined,
         claimed,
         mine: isMine,
         dimmed:
@@ -485,6 +542,15 @@ export function WorldMap({
     return map;
   }, [territories, mine, filter]);
 
+  /**
+   * Beacon size, damped against zoom.
+   *
+   * A beacon's radius is in viewBox units inside the scaled group, so left
+   * alone it would grow linearly with zoom and a micro-state would swallow its
+   * own ocean at 64x. The square root keeps it findable when zoomed out and
+   * proportionate when zoomed in — the stroke around it is non-scaling either
+   * way, so the ring stays a hairline.
+   */
   const markerScale = 1 / Math.sqrt(committed.k);
   const dirty = committed.k !== 1 || committed.x !== 0 || committed.y !== 0;
 
@@ -506,14 +572,15 @@ export function WorldMap({
       >
         <rect x={0} y={0} width={MAP_W} height={MAP_H} fill="var(--m-ocean)" />
         <g ref={gRef}>
-          <MapLayer
+          <MapFills
             paints={paints}
-            selected={selected}
             markerScale={markerScale}
             onSelect={onSelect}
             setHovered={setHovered}
             panning={panning}
           />
+          <MapBorders paints={paints} markerScale={markerScale} />
+          <MapMarks hovered={hovered} selected={selected} markerScale={markerScale} />
         </g>
       </svg>
 

@@ -101,12 +101,22 @@ body:has(.app-root) {
   --m-ocean: #050606;
   /** Land nobody owns yet. Barely above ground; the coastline does the work. */
   --m-unclaimed: #0F1213;
-  /** The lit boundary between countries. Drawn as a non-scaling stroke. */
-  --m-divider: rgb(216 218 216 / 0.30);
-  /** Outline on a territory the connected wallet owns. */
+  /**
+   * The lit boundary. Every country's, at one value.
+   *
+   * Graphite gives `divider` and `rivalStroke` the same colour — both are the
+   * ocean, cutting between land masses on a light board — so the faithful
+   * inversion is one lit hairline everywhere rather than a second, darker
+   * stroke for claimed land. A dark seam was tried and was wrong twice: it is
+   * invisible against unclaimed land, and it made a country's outline change
+   * colour partway round depending on which neighbour drew last.
+   *
+   * 42% rather than 30%: at a 0.75px non-scaling stroke over `--m-unclaimed`,
+   * 30% left interior borders below the threshold where they read as lines.
+   */
+  --m-divider: rgb(216 218 216 / 0.42);
+  /** Outline on a territory the connected wallet owns. Dashed — see map.css. */
   --m-mine-stroke: #F3F3F0;
-  /** Outline on a rival's. A dark seam, so adjacent owner fills separate. */
-  --m-rival-stroke: rgb(5 6 6 / 0.55);
   /** Ring around the selected country. The brightest thing on the board. */
   --m-selection: #F3F3F0;
   /**
