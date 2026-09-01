@@ -432,8 +432,22 @@
 /* ------------------------------------------------------------------ narrow */
 
 @media (max-width: 860px) {
-  .ab-board-topleft { top: var(--s-md); left: var(--s-md); }
-  .ab-board-search { top: var(--s-md); right: var(--s-md); }
+  /* The readouts sit in one corner and the finder in the opposite one, which
+     is a wide-screen luxury: at phone widths those are the same corner, and
+     the finder lands on top of the lens chips. Both stop being anchored and
+     become one wrapping row instead. `.ab-map` is absolutely positioned, so
+     the board behind them does not move. */
+  .ab-board-canvas {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    align-items: center;
+    gap: var(--s-sm);
+    padding: var(--s-md);
+  }
+  .ab-board-topleft,
+  .ab-board-search { position: static; }
+  /* No keyboard to press it with. */
   .ab-board-search kbd { display: none; }
   .ab-map-hud { inset: auto var(--s-md) var(--s-md); }
   /* The hover chip needs a pointer to have a point. */

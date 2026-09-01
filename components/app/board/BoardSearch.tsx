@@ -27,7 +27,37 @@ export function BoardSearch({
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
-  useEffect(() => inputRef.current?.focus(), []);
+  /**
+   * Take focus, and give it back.
+   *
+   * The finder is opened from the keyboard as often as from the chip, so the
+   * place focus came from is the place it has to return to — otherwise ⌘K,
+   * Escape leaves you at the top of the document with the map you were
+   * reading still on screen.
+   */
+  useEffect(() => {
+    const from = document.activeElement as HTMLElement | null;
+    inputRef.current?.focus();
+    return () => from?.focus?.();
+  }, []);
+
+  /** Tab stays inside the dialog while the dialog is over everything else. */
+  const onTrapKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Tab") return;
+    const focusable = event.currentTarget.querySelectorAll<HTMLElement>(
+      'input, button, [href], [tabindex]:not([tabindex="-1"])',
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (!first || !last) return;
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -59,7 +89,9 @@ export function BoardSearch({
       <div
         className="ab-search"
         role="dialog"
+        aria-modal="true"
         aria-label="Find a country"
+        onKeyDown={onTrapKey}
         onPointerDown={(e) => e.stopPropagation()}
       >
         <input

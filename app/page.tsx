@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { fmt, game, priceLadder, site } from "@/lib/site";
@@ -16,7 +18,7 @@ export default function Home() {
           <div className="hero-veil" aria-hidden="true" />
 
           <div className="shell hero-in">
-            <p className="kicker">Live on Solana mainnet · Seeker and Android</p>
+            <p className="kicker">Live on Solana mainnet · Web, Seeker and Android</p>
             <h1>
               Every country
               <br />
@@ -27,10 +29,14 @@ export default function Home() {
               <b className="price">{game.basePrice}&nbsp;SOL</b>, fly your banner over
               it, and get paid the moment another captain takes it.
             </p>
+            {/* The loudest button on the site is the board, not a social
+                profile. "How it works" keeps the secondary slot here because
+                the reader who is not ready to open a map is ready to read one
+                paragraph; X takes it in the closer, where they have. */}
             <div className="cta">
-              <a className="btn btn-solid" href={site.x} rel="noopener">
-                Follow {site.xHandle}
-              </a>
+              <Link className="btn btn-solid" href="/app">
+                Open the board
+              </Link>
               <a className="btn btn-ghost" href="#how">
                 How it works
               </a>
@@ -251,11 +257,11 @@ export default function Home() {
               Every one of them for sale.
             </h2>
             <div className="cta">
-              <a className="btn btn-solid" href={site.x} rel="noopener">
+              <Link className="btn btn-solid" href="/app">
+                Open the board
+              </Link>
+              <a className="btn btn-ghost" href={site.x} rel="noopener">
                 Follow {site.xHandle}
-              </a>
-              <a className="btn btn-ghost" href="#economics">
-                Read the economics
               </a>
             </div>
           </div>

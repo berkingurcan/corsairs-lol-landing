@@ -10,7 +10,7 @@
  * failure switch, which is the same fact wearing a control: the only build
  * where you can arm a failure is the build where nothing is at stake.
  */
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { useBoard } from "@/lib/board/BoardProvider";
 import {
@@ -24,22 +24,44 @@ export function NetworkBadge() {
   const { adapter } = useBoard();
   const armed = useSyncExternalStore(subscribeMockFailure, getMockFailure, () => null);
   const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
+  const close = useCallback((returnFocus = false) => {
+    setOpen(false);
+    if (returnFocus) triggerRef.current?.focus();
+  }, []);
+
+  // Same dismissal contract as the wallet popover next to it: Escape hands
+  // focus back to the trigger, a click elsewhere just closes. Two popovers a
+  // few pixels apart that behave differently is worse than either behaviour.
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close(true);
+    };
+    const onPointer = (e: PointerEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) close();
+    };
+
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+    };
+  }, [open, close]);
 
   if (adapter.kind !== "mock") {
     return <span className="ab-net">Mainnet</span>;
   }
 
   return (
-    <div className="ab-wallet">
+    <div className="ab-wallet" ref={wrapRef}>
       <button
         type="button"
+        ref={triggerRef}
         className="ab-net is-mock"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}

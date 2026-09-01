@@ -47,6 +47,13 @@ body:has(.app-root) .skip {
 
 .app-root ::selection { background: var(--c-text); color: var(--c-bg); }
 
+/* Reduced motion is honoured for this whole surface by globals.css, which
+   zeroes every transition and animation document-wide under
+   `prefers-reduced-motion: reduce`. Nothing here re-implements it, and nothing
+   here animates in JavaScript — `flyTo` jumps rather than eases, and a pan is
+   direct manipulation, which the preference does not cover. If the app is ever
+   split into its own document, that rule has to come with it. */
+
 .app-root :focus-visible {
   outline: 2px solid var(--c-text);
   outline-offset: 2px;
@@ -333,7 +340,11 @@ body:has(.app-root) .skip {
 
   .ab-bar { gap: var(--s-md); }
   .ab-bar .ab-nav { display: none; }
-  .ab-bar .ab-net { display: none; }
+  /* The network badge stays. It was hidden here once, as bar chrome that the
+     phone had no room for — but on the mock build it is the only thing on
+     screen saying the prices are invented, and the phone is where most of
+     this audience reads the board. The wordmark goes instead; anyone who
+     opened the app knows whose app it is. */
 
   .ab-board { grid-template-columns: minmax(0, 1fr); }
   .ab-board-side {
@@ -374,6 +385,8 @@ body:has(.app-root) .skip {
 
 @media (max-width: 420px) {
   .ab-lockup span { display: none; }
+  /* Three pills in a 390px bar. The badge gives up padding, not its label. */
+  .ab-net { padding-inline: var(--s-sm); font-size: var(--fs-xs); }
 }
 
 /* ---------------------------------------------------------------- wallet */
